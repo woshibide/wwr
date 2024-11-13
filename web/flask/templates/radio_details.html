@@ -1,16 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio {{ radio_num }} </title>
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}
+RADIO {{radio_num}} 
+{% endblock %}
+
+{% block content %}
+
 <h1>
     {{radio_num}}
 </h1>
-<p> this is a page with information about {{radio_num}}</p>
-    
-</body>
-</html>
+<p> a page with information about {{radio_num}}</p>
+
+{% endblock %}

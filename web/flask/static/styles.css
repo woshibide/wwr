@@ -1,3 +1,115 @@
-h1{
-    font-size: 10rem;
+/* 
+-----------------------
+----- NAVIGATION ------
+-----------------------
+*/
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    }
+
+body {
+    font-family: "noka", sans-serif;
+    font-weight: 800;
+    font-style: normal;    
+}
+.nav-container {
+    position: relative;
+    text-align: right;
+    z-index: 9999; /* Ensure it's above other elements */
+}
+
+.menu-toggle {
+    position: relative;
+    z-index: 10000; /* Higher than nav-menu */
+    font-size: 5rem;
+    font-weight: bold;
+    padding: 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.5s;
+}
+
+.menu-toggle.active {
+    transform: rotate(45deg);
+}
+
+.nav-menu {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100vh; 
+    display: none; 
+    flex-direction: column;
+    background-color: white;
+    color: black;
+    margin-top: 5rem;
+    padding: 4rem; 
+    z-index: 9999; 
+    overflow: hidden; 
+}
+
+.nav-menu a {
+    font-size: 5rem;
+    color: black;
+    text-decoration: none;
+    margin: 1rem;
+    transition: color 0.3s;
+}
+
+.nav-menu a:hover {
+    color: #333;
+}
+
+.nav-menu.show {
+    display: flex;
+    animation: slideIn 0.5s ease-in forwards;
+}
+
+.nav-menu.hide {
+    animation: slideOut 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-100%);
+    }
+}
+
+/* 
+-----------------------
+------   FOOTER  ------
+-----------------------
+*/
+
+footer{
+    padding: 3rem;
+    display: flex;
+    height: 100vh;
+    background-color: black;
+    color: white;
+}
+
+.footer-container{
+    font-size: 1rem;
+    font-weight: 100;
+    display: inline-block;
+    align-self: flex-end;
+    bottom: 0px;
 }

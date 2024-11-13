@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.typekit.net/pri5ayn.css">
+
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>{% block title %}{% endblock %} WWR </title>
+</head>
+<body>
+    <nav>   
+        {% block navigation %} 
+        <div class="nav-container">
+            <button class="menu-toggle" id="menu-toggle">+</button>
+            <nav class="nav-menu" id="nav-menu">
+              <a href="/">HOME</a>
+              <a href="/radios">RADIOS</a>
+              <a href="/settings">SETTINGS</a>
+              <a href="/contact">CONTACT</a>
+            </nav>
+          </div>
+        {% endblock %}
+    </nav>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        {% block footer %}
+        <div class="footer-container">
+            <p> here will be some footer information i dont know what actually</p>
+        </div>
+        {% endblock %}
+    </footer>
+    <script src="/static/scripts.js"></script>
+</body>
+</html>

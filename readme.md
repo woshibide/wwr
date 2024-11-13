@@ -8,6 +8,6 @@ so the user should have one before trying to access the api
 program flow should be controlled by the script in a way so that 
 if one part of the program fails it doesnt affect execution of the rest
 
-
+would be nice to store a set of headers and pass app, version name into different parts of the programm
 
 
