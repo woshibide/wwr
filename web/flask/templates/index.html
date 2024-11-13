@@ -1,132 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Circular Text with Modular Components</title>
-    <link rel="stylesheet" href="https://use.typekit.net/pri5ayn.css">
-    <style>
-        
-        body, html {
-            font-family: "noka", sans-serif;
-font-weight: 800;
-font-style: normal;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background-color: white;
-            color: white;
-        }
-        .circle-container {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .rotating-circle {
-            position: relative;
-            transform-origin: center center;
-            animation: rotation linear infinite;
-        }
-        svg {
-            overflow: visible;
-        }
-        #wwr {
-            font-family: "noka", sans-serif;
-font-weight: 800;
-font-style: normal;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 2rem;
-            width: 4rem;
-            color: black;
-            background-color: white;
-            z-index: 100;
-            position: absolute;
-            left: 50%;
-            top: 50%; /* Centered vertically */
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            font-size: 2rem;
-            user-select: none;
-        }
-        /* Menu styling */
-        #menu {
-            font-family: "noka", sans-serif;
-font-weight: 300;
-font-style: normal;
-            display: none;
-            position: absolute;
-            left: 50%;
-            top: 50%; /* Starts from the middle of the screen */
-            right: 0;
-            bottom: 0;
-            background-color: white;
-            box-shadow: -4px 0 6px rgba(0,0,0,0.1);
-            z-index: 99;
-            padding: 1rem;
-            overflow: auto;
-        }
-        #menu.active {
-            display: block;
-            animation: slideIn 0.3s ease-out forwards;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .menu-item {
-            padding: 0.75rem 0;
-            cursor: pointer;
-            font-size: 1rem;
-            color: #333;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        .menu-item:hover {
-            background-color: #f0f0f0;
-        }
-        .submenu {
-            padding-left: 1rem;
-            display: none;
-        }
-        .menu-item.expandable::after {
-            content: '▼';
-            float: right;
-        }
-        .menu-item.expanded::after {
-            content: '▲';
-        }
-        .menu-item.expanded + .submenu {
-            display: block;
-        }
-        /* Rotation keyframes */
-        @keyframes rotation {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(-360deg); }
-        }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<div id="wwr">WWR</div>
-<div id="menu">
-    <div class="menu-item expandable">Settings</div>
-    <div class="submenu">
-        <div class="menu-item">General</div>
-        <div class="menu-item">Account</div>
-    </div>
-    <div class="menu-item expandable">Background</div>
-    <div class="submenu">
-        <div class="menu-item">Images</div>
-        <div class="menu-item">Colors</div>
-    </div>
-    <div class="menu-item">Reach Out</div>
-    <div class="menu-item">Profile</div>
-</div>
+{% block title %}HOME{% endblock %}
+
+{% block content %}
+
 
 <script>
     // Sample JSON Input
@@ -209,7 +86,8 @@ font-style: normal;
         const circleContainer = document.createElement('div');
         circleContainer.classList.add('circle-container');
         circleContainer.style.zIndex = totalCircles - index;
-        document.body.appendChild(circleContainer);
+        const mainContainer = document.querySelector('main');
+        mainContainer.appendChild(circleContainer);
 
         // Create a rotating wrapper
         const rotatingCircle = document.createElement('div');
@@ -286,20 +164,6 @@ font-style: normal;
     // Initialize the circular text display with JSON data
     initializeCircularText(circleData);
 
-    // Toggle menu on 'WWR' click
-    const wwr = document.getElementById('wwr');
-    const menu = document.getElementById('menu');
-    wwr.addEventListener('click', () => {
-        menu.classList.toggle('active');
-    });
-
-    // Expandable menu items
-    const expandableItems = document.querySelectorAll('.menu-item.expandable');
-    expandableItems.forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('expanded');
-        });
-    });
 </script>
-</body>
-</html>
+
+{% endblock %}

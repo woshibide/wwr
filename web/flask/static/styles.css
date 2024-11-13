@@ -1,9 +1,3 @@
-/* 
------------------------
------ NAVIGATION ------
------------------------
-*/
-
 *{
     box-sizing: border-box;
     margin: 0;
@@ -15,6 +9,18 @@ body {
     font-weight: 800;
     font-style: normal;    
 }
+
+main{
+    height:100vh;
+    width:100vw;
+}
+
+/* 
+-----------------------
+----- NAVIGATION ------
+-----------------------
+*/
+
 .nav-container {
     position: relative;
     text-align: right;
@@ -61,8 +67,11 @@ body {
     transition: color 0.3s;
 }
 
+
 .nav-menu a:hover {
-    color: #333;
+    text-decoration: underline 1rem;
+    /* TODO: doesnt work */
+    /* animation: underlineIn 0.3s ease-in infinite; */
 }
 
 .nav-menu.show {
@@ -112,4 +121,33 @@ footer{
     display: inline-block;
     align-self: flex-end;
     bottom: 0px;
+}
+
+
+/* 
+-----------------------
+-------- HOME ---------
+-----------------------
+*/
+
+
+
+.circle-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+.rotating-circle {
+    position: relative;
+    transform-origin: center center;
+    animation: rotation linear infinite;
+}
+svg {
+    overflow: visible;
+}
+
+@keyframes rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
 }
