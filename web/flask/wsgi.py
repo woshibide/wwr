@@ -11,14 +11,30 @@
 #   - 
 #
 
-
-from flask import Flask
-from flask import render_template
+import os
+import json
+import logging
+from flask import Flask, render_template, request, redirect, url_for
 
 from radio_api.lookup_radios import downloadRadiobrowserStats
+from audio_player import AudioPlayer
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.run(debug=True)
+
+STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
+audio_player = AudioPlayer()
+
+
+def load_stations_from_json():
+    try:
+        with open(STATION_JSON_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
 
 @app.route('/')
 def index():
@@ -32,29 +48,57 @@ def info():
 
 @app.route('/radios')
 def radios():
-    # get the number of currently available working stations
-    stats = downloadRadiobrowserStats()
     # TODO: cache the result
     # TODO: load html and then display currently working stations
 
-    if stats and 'stations' and 'stations_broken' in stats:
-        stations_working = stats['stations'] - stats['stations_broken']
-    else:
-        stations_working = 'UNKNOWN'
+    stations = load_stations_from_json()
 
-    return render_template('radios.html', stations_working=stations_working)
+    stations_working = len(stations)
+    logging.info(f"loaded {stations_working} stations") 
 
+    return render_template('radios.html', stations_working=stations_working, stations=stations)
 
-# should radios be numbered? some sort of conversion needs to take place
 @app.route('/radios/<int:radio_num>')
 def radio_details(radio_num):
-    # return render template of a radio station info
-    # return f'<h1>{radio_num}</h1><br>radio station'
-    return render_template('radio_details.html', radio_num=radio_num)
+    stations = load_stations_from_json()
+
+    if radio_num < 1 or radio_num > len(stations):
+        return f"Radio station {radio_num} not found.", 404
+
+    station = stations[radio_num - 1]
+
+    return render_template('radio_details.html', radio_num=radio_num, station=station)
+
+    # TODO: display all relevant information about the radio
+    # TODO: once accessed start playing the stream 
+
+
+@app.route('/radios/play/<int:radio_num>', methods=['POST'])
+def play_radio(radio_num):
+    stations = load_stations_from_json()
+    if radio_num < 1 or radio_num > len(stations):
+        return f"Radio station {radio_num} not found.", 404
+
+    station = stations[radio_num - 1]
+    stream_url = station['url']
+
+    try:
+        # Use the AudioPlayer instance to play the stream
+        audio_player.play_stream(stream_url)
+        return redirect(url_for('radio_details', radio_num=radio_num))
+    except Exception as e:
+        return f"Error playing the radio stream: {e}", 500
+
+
 
 @app.route('/settings')
 def user_settings():
     # settings to be saved into a file and returned to user
     return render_template('settings.html')
 
+
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
 

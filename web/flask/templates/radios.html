@@ -3,7 +3,16 @@
 {% block title %}RADIOS{% endblock %}
 
 {% block content %}
+<h1> i know {{ stations_working }} stations</h1>
 
-<h1>there are currently {{ stations_working }} stations online</h1>
-
+<ul>
+    {% for station in stations %}
+        <li>
+            <a href="{{ url_for('radio_details', radio_num=loop.index) }}">
+                {{ station.name }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
+

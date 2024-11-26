@@ -177,10 +177,10 @@ if __name__ == "__main__":
         print("No stats available.")
 
     # Uncomment the following lines to fetch station info
-    # logging.info("Station Info")
-    # logging.info("------------")
-    # stations = downloadRadiobrowserStationsByName("Silver Rain")
-    # if stations:
-    #     print(json.dumps(stations, indent=4))
-    # else:
-    #     print("No station info available.")
+    logging.info("Station Info")
+    logging.info("------------")
+    stations = downloadRadiobrowserStationsByName("Silver Rain")
+    if stations:
+        print(json.dumps(stations, indent=4))
+    else:
+        print("No station info available.")

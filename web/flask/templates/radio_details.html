@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}RADIOS/{{radio_num}}{% endblock %}
+{% block title %}RADIOS/{{ radio_num }}{% endblock %}
 
 {% block content %}
+<h1>Station Details for {{ station.name }}</h1>
 
-<h1>
-    {{radio_num}}
-</h1>
-<p> a page with information about {{radio_num}}</p>
+<p><strong>Country:</strong> {{ station.country }}</p>
+<p><strong>URL:</strong> <a href="{{ station.url }}" target="_blank">Listen</a></p>
+<p><strong>Codec:</strong> {{ station.codec }}</p>
+<p><strong>Bitrate:</strong> {{ station.bitrate }} kbps</p>
+<p><strong>Last Check:</strong> {{ station.lastcheckoktime }}</p>
+
+<img src="{{ station.favicon }}" alt="{{ station.name }} favicon" width="50">
+
+<form method="POST" action="{{ url_for('play_radio', radio_num=radio_num) }}">
+    <button type="submit">Play Stream</button>
+</form>
 
 {% endblock %}
+
