@@ -23,8 +23,9 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
  
-
-STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
+# STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
+# this is temporary change for mac os development
+STATION_JSON_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/station_scope.json')
 audio_player = AudioPlayer()
 
 
@@ -33,6 +34,7 @@ def load_stations_from_json():
         with open(STATION_JSON_PATH, 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
+        logging.error(f"file not found!!!! nothing in {STATION_JSON_PATH}")
         return []
 
 
@@ -73,24 +75,25 @@ def radio_details(radio_num):
     # TODO: once accessed start playing the stream 
 
 
-@app.route('/radios/play/<int:radio_num>', methods=['POST'])
+@app.route('/radios/play/<int:radio_num>', methods=['GET'])
 def play_radio(radio_num):
     stations = load_stations_from_json()
+    
     if radio_num < 1 or radio_num > len(stations):
         return f"Radio station {radio_num} not found.", 404
-
+    
     station = stations[radio_num - 1]
     stream_url = station['url']
 
     try:
         # Use the AudioPlayer instance to play the stream
         audio_player.play_stream(stream_url)
-        print(f'stream url: {stream_url}')
-        return redirect(url_for('radio_details', radio_num=radio_num))
+        print(f'trying to play stream url: {stream_url}')
+        return '', 204  # No content response, successful
     except Exception as e:
         return f"Error playing the radio stream: {e}", 500
-
-
+    
+    
 
 @app.route('/settings')
 def user_settings():

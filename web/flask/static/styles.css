@@ -1,18 +1,18 @@
-*{
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    }
+}
 
 body {
     font-family: "noka", sans-serif;
     font-weight: 800;
-    font-style: normal;    
+    font-style: normal;
 }
 
-main{
-    height:100vh;
-    width:100vw;
+main {
+    min-height: 100vh;
+    width: 100%;
 }
 
 /* 
@@ -22,41 +22,43 @@ main{
 */
 
 .nav-container {
-    position: relative;
+    position: fixed;
     text-align: right;
-    z-index: 9999; /* Ensure it's above other elements */
+    z-index: 9999;
+    /* Ensure it's above other elements */
 }
 
 .menu-toggle {
     position: relative;
-    z-index: 10000; /* Higher than nav-menu */
+    z-index: 10000;
+    /* Higher than nav-menu */
     font-size: 5rem;
     font-weight: bold;
     padding: 1rem;
     border: none;
     background: none;
     cursor: pointer;
-    transition: transform 0.5s;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .menu-toggle.active {
     transform: rotate(45deg);
+    /* transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); */
 }
 
 .nav-menu {
-    position: fixed; 
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%; 
-    height: 100vh; 
-    display: none; 
+    width: 100%;
+    height: 100vh;
+    display: none;
     flex-direction: column;
     background-color: white;
     color: black;
-    margin-top: 5rem;
-    padding: 4rem; 
-    z-index: 9999; 
-    overflow: hidden; 
+    padding: 4rem;
+    z-index: 9999;
+    overflow: hidden;
 }
 
 .nav-menu a {
@@ -76,17 +78,18 @@ main{
 
 .nav-menu.show {
     display: flex;
-    animation: slideIn 0.5s ease-in forwards;
+    animation: slideIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 .nav-menu.hide {
-    animation: slideOut 0.5s ease-out forwards;
+    animation: slideOut 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 @keyframes slideIn {
     from {
         transform: translateY(-100%);
     }
+
     to {
         transform: translateY(0);
     }
@@ -96,6 +99,7 @@ main{
     from {
         transform: translateY(0);
     }
+
     to {
         transform: translateY(-100%);
     }
@@ -107,7 +111,7 @@ main{
 -----------------------
 */
 
-footer{
+footer {
     padding: 3rem;
     display: flex;
     height: 100vh;
@@ -115,7 +119,7 @@ footer{
     color: white;
 }
 
-.footer-container{
+.footer-container {
     font-size: 1rem;
     font-weight: 100;
     display: inline-block;
@@ -138,16 +142,74 @@ footer{
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
 .rotating-circle {
     position: relative;
     transform-origin: center center;
     animation: rotation linear infinite;
 }
+
 svg {
     overflow: visible;
 }
 
 @keyframes rotation {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(-360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+
+
+/* 
+-----------------------------
+-------- RADIO LIST ---------
+-----------------------------
+*/
+
+
+.radio-list-wrapper {
+}
+
+.radios-list {
+    padding: 2rem;
+    display: list-item;
+    list-style: none;
+    text-align: center;
+}
+
+.radio-play-btn {
+    background: none;
+    border: none;
+    color: black;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0;
+    text-transform: uppercase;
+    font-family: inherit;
+    text-align: center;
+}
+
+.radio-play-btn:hover, .radios-list a:hover{
+    text-decoration: underline 0.5rem;
+}
+
+.radio-details-link {
+    font-size: inherit;
+    text-decoration: none;
+    color: black;
+}
+
+
+ul .radios-list li {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 800;
 }

@@ -1,18 +1,24 @@
 {% extends "base.html" %}
-
 {% block title %}RADIOS{% endblock %}
-
 {% block content %}
-<h1> i know {{ stations_working }} stations</h1>
-
-<ul>
-    {% for station in stations %}
-        <li>
-            <a href="{{ url_for('radio_details', radio_num=loop.index) }}">
-                {{ station.name }}
-            </a>
-        </li>
-    {% endfor %}
-</ul>
+<h1>I know {{ stations_working }} stations</h1>
+    <div class="radio-list-wrapper">
+        <ul>
+            <div class="radios-list">
+                {% for station in stations %}
+                <li>
+                    <button type="button" 
+                            class="radio-play-btn" 
+                            onclick="window.location.href='{{ url_for('play_radio', radio_num=loop.index) }}'">
+                        {{ station.name }}
+                    </button>
+                    <!-- radio details -->
+                    <a href="{{ url_for('radio_details', radio_num=loop.index) }}" class="radio-details-link">
+                        ?
+                    </a>
+                </li>
+                {% endfor %}
+            </div>
+        </ul>
+    </div>
 {% endblock %}
-
