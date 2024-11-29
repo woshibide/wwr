@@ -4,7 +4,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-def fetch_stations(limit=10):
+def fetch_stations(limit=50):
     url = f"https://de1.api.radio-browser.info/json/stations/search?limit={limit}"
     response = requests.get(url)
     
@@ -23,7 +23,7 @@ def save_stations_to_json(stations, filename='../state/station_scope.json'):
 
 def main():
     logging.info("Fetching radio stations...")
-    stations = fetch_stations(limit=30)  
+    stations = fetch_stations(limit=100)  
     if stations:
         save_stations_to_json(stations)
     else:

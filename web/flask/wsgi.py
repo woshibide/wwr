@@ -9,7 +9,7 @@
 #       - if there are saved radiostations those to play first, otherwise the last one in use
 #   - be influenced by the input from the knob
 #   - 
-#
+##  when post request is sent and want to go back it actually sends post request again 
 
 import os
 import json
@@ -22,7 +22,7 @@ from audio_player import AudioPlayer
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.run(debug=True)
+ 
 
 STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
 audio_player = AudioPlayer()
@@ -85,6 +85,7 @@ def play_radio(radio_num):
     try:
         # Use the AudioPlayer instance to play the stream
         audio_player.play_stream(stream_url)
+        print(f'stream url: {stream_url}')
         return redirect(url_for('radio_details', radio_num=radio_num))
     except Exception as e:
         return f"Error playing the radio stream: {e}", 500
@@ -100,5 +101,5 @@ def user_settings():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", debug=True, port=5000)
 
