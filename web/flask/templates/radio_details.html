@@ -3,19 +3,87 @@
 {% block title %}RADIOS/{{ radio_num }}{% endblock %}
 
 {% block content %}
-<h1>Station Details for {{ station.name }}</h1>
+<div class="radio-dtl-wrapper">
+    <p>
+        There is a radio station playing in {{ station.country }} now, it's called {{ station.name }}.
+        they host their website <a href="{{ station.url }}" target="_blank">here</a>.
+        someone listened to it on the internet
+        <span id="last-check-time">{{ station.lastcheckoktime }}</span>,
+        and since yesterday
+        <span id="click-count">{{ station.clickcount }}</span> listened to it.
+    </p>
 
-<p><strong>Country:</strong> {{ station.country }}</p>
-<p><strong>URL:</strong> <a href="{{ station.url }}" target="_blank">Listen</a></p>
-<p><strong>Codec:</strong> {{ station.codec }}</p>
-<p><strong>Bitrate:</strong> {{ station.bitrate }} kbps</p>
-<p><strong>Last Check:</strong> {{ station.lastcheckoktime }}</p>
+    <p> maybe
+        <button type="button" id="radio-play-text"
+            onclick="window.location.href='{{ url_for('play_radio', radio_num=radio_num) }}'">
+            listen
+        </button>
+        to it?    
+    </p>
 
-<img src="{{ station.favicon }}" alt="{{ station.name }} favicon" width="50">
+</div>
 
-<form method="POST" action="{{ url_for('play_radio', radio_num=radio_num) }}">
-    <button type="submit">Play Stream</button>
-</form>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        //  timestamp to human-readable format
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const past = new Date(timestamp);
+            const diffMs = now - past;
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const diffDays = Math.floor(diffHours / 24);
 
+            if (diffSeconds < 60) {
+                return 'just now';
+            } else if (diffMinutes < 60) {
+                return 'a few minutes ago';
+            } else if (diffHours < 2) {
+                return 'about an hour ago';
+            } else if (diffHours < 24) {
+                return 'a few hours ago';
+            } else if (diffDays < 2) {
+                return 'yesterday';
+            } else if (diffDays < 7) {
+                return 'earlier this week';
+            } else if (diffDays < 30) {
+                return 'a few weeks ago';
+            } else {
+                return 'a while back';
+            }
+        }
+
+        // convert to readable text
+        function formatClickCount(count) {
+            if (count === 0) {
+                return 'no one';
+            } else if (count === 1) {
+                return 'one person';
+            } else if (count < 25) {
+                return `just a few people`;
+            } else if (count < 75) {
+                return `fifty, or so, people`;
+            } else if (count < 900) {
+                return `hundreds of people`;
+            } else if (count < 2000) {
+                return `thousands of people`;
+            } else {
+                return `a lot, like really a lot, of people`;
+            }
+        }
+
+        // update last check time
+        const lastCheckTimeEl = document.getElementById('last-check-time');
+        if (lastCheckTimeEl) {
+            lastCheckTimeEl.textContent = formatTimeAgo(lastCheckTimeEl.textContent);
+        }
+
+        // update click count
+        const clickCountEl = document.getElementById('click-count');
+        if (clickCountEl) {
+            clickCountEl.textContent = formatClickCount(parseInt(clickCountEl.textContent));
+        }
+    });
+</script>
 {% endblock %}
-

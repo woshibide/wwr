@@ -10,4 +10,5 @@ if one part of the program fails it doesnt affect execution of the rest
 
 would be nice to store a set of headers and pass app, version name into different parts of the programm
 
-
+## bugs
+[] fetch_radio_stations can fail sometimes

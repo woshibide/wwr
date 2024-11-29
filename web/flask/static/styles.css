@@ -4,13 +4,74 @@
     padding: 0;
 }
 
+/* 
+-----------------------------
+-------- TRANSITION ---------
+-------- ANIMATION ----------
+-----------------------------
+*/
+
+@keyframes underliner {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes pageEnter {
+    0% {
+        /* transform: translateX(100%); */
+        opacity: 0;
+    }
+
+    100% {
+        /* transform: translateX(0); */
+        opacity: 1;
+    }
+}
+
+@keyframes pageExit {
+    0% {
+        /* transform: translateX(0); */
+        opacity: 1;
+    }
+
+    100% {
+        /* transform: translateX(-100%); */
+        opacity: 0;
+    }
+}
+
+.page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+html {
+    overflow-x: hidden;
+}
+
 body {
+    overflow-x: hidden;
     font-family: "noka", sans-serif;
     font-weight: 800;
     font-style: normal;
 }
 
 main {
+    position: relative;
+    animation: pageEnter 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     min-height: 100vh;
     width: 100%;
 }
@@ -25,25 +86,25 @@ main {
     position: fixed;
     text-align: right;
     z-index: 9999;
-    /* Ensure it's above other elements */
 }
 
 .menu-toggle {
     position: relative;
     z-index: 10000;
-    /* Higher than nav-menu */
     font-size: 5rem;
     font-weight: bold;
     padding: 1rem;
     border: none;
     background: none;
     cursor: pointer;
+    transform-origin: center center;
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .menu-toggle.active {
+    transform-origin: center center;
     transform: rotate(45deg);
-    /* transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); */
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .nav-menu {
@@ -61,28 +122,47 @@ main {
     overflow: hidden;
 }
 
+
 .nav-menu a {
     font-size: 5rem;
     color: black;
     text-decoration: none;
     margin: 1rem;
-    transition: color 0.3s;
+    transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-
 
 .nav-menu a:hover {
     text-decoration: underline 1rem;
-    /* TODO: doesnt work */
-    /* animation: underlineIn 0.3s ease-in infinite; */
+    transition: text-decoration 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
+
+.nav-menu p{
+    position: absolute;
+    margin: 1rem;
+    bottom: 2rem;
+    right: 5rem;
+}
+
+/* 
+TODO: make it work for underline hovers
+.nav-menu a::after {
+    opacity: 1;
+    transform: scale(0);
+    transform-origin: center;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a:focus::after {
+    transform: scale(1);
+} */
 
 .nav-menu.show {
     display: flex;
-    animation: slideIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 .nav-menu.hide {
-    animation: slideOut 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: slideOut 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
 @keyframes slideIn {
@@ -173,6 +253,7 @@ svg {
 
 
 .radio-list-wrapper {
+    margin-block: 1rem;
 }
 
 .radios-list {
@@ -182,7 +263,7 @@ svg {
     text-align: center;
 }
 
-.radio-play-btn {
+#radio-play-text {
     background: none;
     border: none;
     color: black;
@@ -195,7 +276,8 @@ svg {
     text-align: center;
 }
 
-.radio-play-btn:hover, .radios-list a:hover{
+#radio-play-text:hover,
+.radios-list a:hover {
     text-decoration: underline 0.5rem;
 }
 
@@ -212,4 +294,36 @@ ul .radios-list li {
     text-align: center;
     text-transform: uppercase;
     font-weight: 800;
+}
+
+
+/* 
+-----------------------------
+----------- RADIO -----------
+---------- DETAILS ----------
+-----------------------------
+*/
+
+.radio-dtl-wrapper {
+    padding: 1rem;
+    margin-top: 50svh;
+    font-size: 2rem;
+}
+
+.radio-dtl-wrapper p {
+    text-align: justify;
+    text-justify: newspaper;
+    max-width: 50ch;
+    text-transform: lowercase;
+}
+
+.radio-dtl-wrapper p a {
+    text-decoration: underline 0.5rem;
+    color: black;
+}
+
+.radio-dtl-wrapper #radio-play-text {
+    text-transform: lowercase;
+    margin-top: 1rem;
+    text-decoration: underline 0.5rem;
 }

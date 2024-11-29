@@ -55,12 +55,12 @@ def radios():
 
     stations = load_stations_from_json()
 
-    stations_working = len(stations)
+    stations_working = len(stations) # not true, some are broken
     logging.info(f"loaded {stations_working} stations") 
 
     return render_template('radios.html', stations_working=stations_working, stations=stations)
 
-@app.route('/radios/<int:radio_num>')
+@app.route('/radios/<int:radio_num>', methods=['GET'])
 def radio_details(radio_num):
     stations = load_stations_from_json()
 
@@ -68,11 +68,9 @@ def radio_details(radio_num):
         return f"Radio station {radio_num} not found.", 404
 
     station = stations[radio_num - 1]
+    clickcount = station.get('clickcount', 0)  # in case its missing would say no one listened
 
-    return render_template('radio_details.html', radio_num=radio_num, station=station)
-
-    # TODO: display all relevant information about the radio
-    # TODO: once accessed start playing the stream 
+    return render_template('radio_details.html', radio_num=radio_num, station=station, clickcount=clickcount)
 
 
 @app.route('/radios/play/<int:radio_num>', methods=['GET'])
@@ -93,7 +91,7 @@ def play_radio(radio_num):
     except Exception as e:
         return f"Error playing the radio stream: {e}", 500
     
-    
+
 
 @app.route('/settings')
 def user_settings():
