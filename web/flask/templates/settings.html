@@ -27,22 +27,133 @@ SETTINGS
 
 
     <div class="favorite-stations">
-        <h2>favorite stations</h2>
+        <h2>my favorites</h2>
         <ul>
             {% for station in settings['Favourite Stations'] %}
             <li>
+                <div class="station-live-indicator {% if station['is_it_live'] %}live{% endif %}"></div>
                 <span>{{ station['name'] }}</span>
                 <input type="text" value="{{ station['personal_title'] }}"
                     data-stationuuid="{{ station['stationuuid'] }}" oninput="markForUpdate(this)" />
+                <div class="station-actions">
+                    <button class="delete-btn" onclick="confirmDeleteStation('{{ station['stationuuid'] }}')"
+                        title="remove from favorites">
+                        delete
+                    </button>
+                    <button class="play-btn" onclick="playStation('{{ station['stationuuid'] }}')"
+                        title="play this station">
+                        PLAY
+                    </button>
+                </div>
             </li>
             {% endfor %}
         </ul>
-        <button onclick="savePersonalTitles()" class="save-btn">Save Changes</button>
+        <button onclick="savePersonalTitles()" class="save-btn">save changes</button>
     </div>
+
 </div>
 
 <script>
     let personalTitlesUpdates = [];
+    let stationsToDelete = [];
+
+    function markForUpdate(inputElement) {
+        const stationuuid = inputElement.getAttribute('data-stationuuid');
+        const personalTitle = inputElement.value;
+
+        // Remove any existing update for this station
+        personalTitlesUpdates = personalTitlesUpdates.filter(
+            update => update.stationuuid !== stationuuid
+        );
+
+        // Add new update
+        personalTitlesUpdates.push({
+            stationuuid: stationuuid,
+            personalTitle: personalTitle
+        });
+    }
+
+    function confirmDeleteStation(stationuuid) {
+        const stationElement = document.querySelector(`input[data-stationuuid="${stationuuid}"]`).closest('li');
+
+        if (stationElement.classList.contains('staged-for-deletion')) {
+            // If already staged, unstage
+            stationElement.classList.remove('staged-for-deletion');
+            stationsToDelete = stationsToDelete.filter(uuid => uuid !== stationuuid);
+        } else {
+            // Stage for deletion
+            stationElement.classList.add('staged-for-deletion');
+            stationsToDelete.push(stationuuid);
+        }
+    }
+
+    function playStation(stationuuid) {
+        // Fetch stations from station_scope.json to find the correct index
+        fetch('/state/station_scope.json')
+            .then(response => response.json())
+            .then(stations => {
+                // Find the index of the station with the matching stationuuid
+                const stationIndex = stations.findIndex(
+                    station => station.stationuuid === stationuuid
+                );
+
+                if (stationIndex !== -1) {
+                    // Add 1 to the index because the route uses 1-based indexing
+                    return fetch(`/radios/play/${stationIndex + 1}`);
+                } else {
+                    throw new Error('Station not found');
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Station started playing');
+                } else {
+                    console.error('Failed to start station');
+                }
+            })
+            .catch(error => {
+                console.error('Error playing station:', error);
+            });
+    }
+
+    function savePersonalTitles() {
+        const payload = {
+            personalTitles: personalTitlesUpdates,
+            deleteStations: stationsToDelete
+        };
+
+        fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Remove staged-for-deletion elements
+                    stationsToDelete.forEach(stationuuid => {
+                        const stationElement = document.querySelector(`input[data-stationuuid="${stationuuid}"]`).closest('li');
+                        if (stationElement) {
+                            stationElement.remove();
+                        }
+                    });
+
+                    // Reset update tracking
+                    personalTitlesUpdates = [];
+                    stationsToDelete = [];
+
+                    //alert('Changes saved successfully!');
+                } else {
+                    //alert('Failed to save changes.');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving changes:', error);
+                alert('An error occurred while saving changes.');
+            });
+    }
 
     function markForUpdate(inputElement) {
         const stationuuid = inputElement.getAttribute('data-stationuuid');
@@ -78,31 +189,6 @@ SETTINGS
             })
             .catch(error => {
                 console.error('Error updating volume:', error);
-            });
-    }
-
-    function savePersonalTitles() {
-        if (personalTitlesUpdates.length === 0) return;
-
-        fetch('/settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ personalTitles: personalTitlesUpdates })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Personal titles updated successfully!');
-                    personalTitlesUpdates = [];
-                } else {
-                    alert('Failed to update personal titles.');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating personal titles:', error);
-                alert('An error occurred while updating personal titles.');
             });
     }
 </script>

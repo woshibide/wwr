@@ -1,22 +1,22 @@
 {
     "User Settings": [
         {
-            "last_station": "bbac radio",
-            "volume": 73
+            "last_station_uuid": "ef2dac34-be6c-4f6f-9408-88947e0219cb",
+            "volume": 58
         }
     ],
     "Favourite Stations": [
         {
             "name": "\tBBC Radio 3 Unwind",
             "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
-            "personal_title": "bbc",
+            "personal_title": "i like this one a lot",
             "is_it_live": true
         },
         {
-            "name": "\tkulak Radio ",
-            "personal_title": "another one of my favorite stations",
-            "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
-            "is_it_live": false
+            "name": " Exclusively Whitney Houston ",
+            "stationuuid": "ef2dac34-be6c-4f6f-9408-88947e0219cb",
+            "personal_title": "i kinda of liked it",
+            "is_it_live": true
         }
     ]
 }

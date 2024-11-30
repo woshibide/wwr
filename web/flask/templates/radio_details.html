@@ -18,9 +18,13 @@
             onclick="window.location.href='{{ url_for('play_radio', radio_num=radio_num) }}'">
             listen
         </button>
-        to it?    
+        to it?
+        <button type="button" id="add-radio-to-fav"
+            onclick="addToFavorites('{{ station.name }}', '{{ station.stationuuid }}')">
+            add
+        </button>
+        to favorites?
     </p>
-
 </div>
 
 <script>
@@ -85,5 +89,35 @@
             clickCountEl.textContent = formatClickCount(parseInt(clickCountEl.textContent));
         }
     });
+
+
+
+
+    function addToFavorites(name, stationuuid) {
+        const data = {
+            name: name,
+            stationuuid: stationuuid,
+            personal_title: "i kinda of liked it", 
+            is_it_live: true // TODO: check dynamically
+        };
+
+        fetch('/add_favorite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'noooooooooooooo');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+
+
 </script>
 {% endblock %}
