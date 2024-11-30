@@ -103,6 +103,11 @@ def play_radio(radio_num):
 
 
 @app.route('/add_favorite', methods=['POST'])
+# BUG: Uncaught SyntaxError: '' string literal contains an unescaped line break
+#      some station names are funky
+#      when rendering names some characters can be dropped, what is really needed is . and ()
+
+# TODO: check if after pressing "add" button the change to favorites list needs to be propagated into the json
 def add_favorite():
     """
         endpoint to add a radio station to the favorites list.
@@ -183,7 +188,6 @@ def user_settings():
         logging.error(f"Error loading settings: {e}")
         settings = {
             "User Settings": [{"last_station": "", "volume": 25}],
-            "Favourite Stations": []
         }
 
     if request.method == 'POST':

@@ -262,6 +262,7 @@ svg {
     display: list-item;
     list-style: none;
     text-align: center;
+    text-decoration: none;
 }
 
 #radio-play-text, #add-radio-to-fav {
@@ -275,10 +276,11 @@ svg {
     text-transform: lowercase;
     font-family: inherit;
     text-align: center;
-    text-decoration: underline 0.5rem;
+    text-decoration: none;
 }
 
-.radios-list a:hover {
+
+#radio-play-text:hover, .radios-list a:hover {
     text-decoration: underline 0.5rem;
 }
 
@@ -290,6 +292,7 @@ svg {
 
 
 ul .radios-list li {
+    text-decoration: none;
     font-size: 2rem;
     margin-bottom: 1.5rem;
     text-align: center;
