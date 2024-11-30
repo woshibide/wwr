@@ -1,0 +1,22 @@
+{
+    "User Settings": [
+        {
+            "last_station": "bbac radio",
+            "volume": 73
+        }
+    ],
+    "Favourite Stations": [
+        {
+            "name": "\tBBC Radio 3 Unwind",
+            "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
+            "personal_title": "bbc",
+            "is_it_live": true
+        },
+        {
+            "name": "\tkulak Radio ",
+            "personal_title": "another one of my favorite stations",
+            "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
+            "is_it_live": false
+        }
+    ]
+}

@@ -14,19 +14,22 @@
 import os
 import json
 import logging
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 
 from radio_api.lookup_radios import downloadRadiobrowserStats
 from audio_player import AudioPlayer
 
+app = Flask(__name__)
+audio_player = AudioPlayer()
+ 
 logging.basicConfig(level=logging.INFO)
 
-app = Flask(__name__)
- 
 # STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
+# USER_SETTINGS_PATH = os.path.expanduser('~/wwr/web/flask/state/user_settings.json')
+
 # this is temporary change for mac os development
 STATION_JSON_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/station_scope.json')
-audio_player = AudioPlayer()
+USER_SETTINGS_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/user_settings.json')
 
 
 def load_stations_from_json():
@@ -36,6 +39,15 @@ def load_stations_from_json():
     except FileNotFoundError:
         logging.error(f"file not found!!!! nothing in {STATION_JSON_PATH}")
         return []
+
+def load_user_settings():
+    try: 
+        with open(USER_SETTINGS_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logging.error(f"file not found!!!! nothing in {STATION_JSON_PATH}")
+        return []
+
 
 
 @app.route('/')
@@ -93,12 +105,48 @@ def play_radio(radio_num):
     
 
 
-@app.route('/settings')
+
+@app.route('/settings', methods=['GET', 'POST'])
 def user_settings():
-    # settings to be saved into a file and returned to user
-    return render_template('settings.html')
+    try:
+        with open(USER_SETTINGS_PATH, 'r', encoding='utf-8') as f:
+            settings = json.load(f)
+    except Exception as e:
+        logging.error(f"Error loading settings: {e}")
+        settings = {
+            "User Settings": [{"last_station": "", "volume": 25}],
+            "Favourite Stations": []
+        }
 
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            logging.info(f"Received data: {data}")
 
+            # Handle volume update
+            if 'volume' in data:
+                volume = int(data['volume'])
+                settings['User Settings'][0]['volume'] = volume
+
+            # Handle personal title update
+            if 'personalTitles' in data:
+                for station_update in data['personalTitles']:
+                    for station in settings['Favourite Stations']:
+                        if station['stationuuid'] == station_update['stationuuid']:
+                            station['personal_title'] = station_update['personalTitle']
+                            break
+
+            # Save updated settings
+            with open(USER_SETTINGS_PATH, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=4)
+
+            return jsonify({"status": "success"})
+        
+        except Exception as e:
+            logging.error(f"Error processing settings: {e}")
+            return jsonify({"status": "error", "message": str(e)}), 400
+
+    return render_template('settings.html', settings=settings)
 
 
 if __name__ == "__main__":

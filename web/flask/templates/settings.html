@@ -1,10 +1,110 @@
 {% extends 'base.html' %}
 
 {% block title %}
-WWR / SETTINGS
+SETTINGS
 {% endblock %}
 
 {% block content %}
-<h1>this is a settings page</h1>
-<div class="user-settings"></div>
+<div class="settings-container">
+    <div class="sliders">
+        <div class="slider-control">
+            <label for="volume">volume</label>
+            <input id="volume" type="range" min="0" max="100" value="{{ settings['User Settings'][0]['volume'] }}"
+                oninput="updateVolume(this.value)" />
+            <span id="volume-display">{{ settings['User Settings'][0]['volume'] }}%</span>
+        </div>
+        <div class="slider-control">
+            <label for="bass">bass</label>
+            <input id="bass" type="range" min="0" max="100" value="{{ settings['User Settings'][0]['volume'] }}" />
+            <span id="bass-display">{{ settings['User Settings'][0]['volume'] }}%</span>
+        </div>
+        <div class="slider-control">
+            <label for="tremble">tremble</label>
+            <input id="tremble" type="range" min="0" max="100" value="{{ settings['User Settings'][0]['volume'] }}" />
+            <span id="tremble-display">{{ settings['User Settings'][0]['volume'] }}%</span>
+        </div>
+    </div>
+
+
+    <div class="favorite-stations">
+        <h2>favorite stations</h2>
+        <ul>
+            {% for station in settings['Favourite Stations'] %}
+            <li>
+                <span>{{ station['name'] }}</span>
+                <input type="text" value="{{ station['personal_title'] }}"
+                    data-stationuuid="{{ station['stationuuid'] }}" oninput="markForUpdate(this)" />
+            </li>
+            {% endfor %}
+        </ul>
+        <button onclick="savePersonalTitles()" class="save-btn">Save Changes</button>
+    </div>
+</div>
+
+<script>
+    let personalTitlesUpdates = [];
+
+    function markForUpdate(inputElement) {
+        const stationuuid = inputElement.getAttribute('data-stationuuid');
+        const personalTitle = inputElement.value;
+
+        // Remove any existing update for this station
+        personalTitlesUpdates = personalTitlesUpdates.filter(
+            update => update.stationuuid !== stationuuid
+        );
+
+        // Add new update
+        personalTitlesUpdates.push({
+            stationuuid: stationuuid,
+            personalTitle: personalTitle
+        });
+    }
+
+    function updateVolume(value) {
+        document.getElementById('volume-display').textContent = `${value}%`;
+
+        fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ volume: parseInt(value) })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Volume updated successfully');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating volume:', error);
+            });
+    }
+
+    function savePersonalTitles() {
+        if (personalTitlesUpdates.length === 0) return;
+
+        fetch('/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ personalTitles: personalTitlesUpdates })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Personal titles updated successfully!');
+                    personalTitlesUpdates = [];
+                } else {
+                    alert('Failed to update personal titles.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating personal titles:', error);
+                alert('An error occurred while updating personal titles.');
+            });
+    }
+</script>
+
 {% endblock %}
