@@ -27,18 +27,23 @@ SETTINGS
 
 
     <div class="favorite-stations">
-        <h2>my favorites</h2>
+        <div class="favorite-stations-header">
+            <h2>my favorites</h2>
+            <button onclick="savePersonalTitles()" class="save-btn">save changes</button>
+        </div>
         <ul>
             {% for station in settings['Favourite Stations'] %}
             <li>
                 <div class="station-live-indicator {% if station['is_it_live'] %}live{% endif %}"></div>
-                <span>{{ station['name'] }}</span>
+                <div class="marquee-container">
+                    <div class="marquee-content" id="marqueeContent">{{ station['name'] }}&ensp;&ensp;&ensp;{{ station['name'] }}&ensp;&ensp;&ensp;</div>
+                </div>
                 <input type="text" value="{{ station['personal_title'] }}"
                     data-stationuuid="{{ station['stationuuid'] }}" oninput="markForUpdate(this)" />
                 <div class="station-actions">
                     <button class="delete-btn" onclick="confirmDeleteStation('{{ station['stationuuid'] }}')"
                         title="remove from favorites">
-                        delete
+                        🗑️
                     </button>
                     <button class="play-btn" onclick="playStation('{{ station['stationuuid'] }}')"
                         title="play this station">
@@ -48,12 +53,48 @@ SETTINGS
             </li>
             {% endfor %}
         </ul>
-        <button onclick="savePersonalTitles()" class="save-btn">save changes</button>
     </div>
+
 
 </div>
 
 <script>
+
+    // marquee
+    document.addEventListener('DOMContentLoaded', () => {
+    function setupMarquee(element) {
+        
+        // for the smoothness
+        const originalContent = element.textContent;
+        element.innerHTML = `${originalContent} ${originalContent}`;
+        
+        let position = 0;
+        const containerWidth = element.parentElement.offsetWidth;
+        const contentWidth = element.offsetWidth / 2;
+        
+        requestAnimationFrame(() => {
+            // dont know why but helps
+            element.style.opacity = '1';
+            
+            function animate() {
+                position -= 0.5; 
+                
+                if (Math.abs(position) >= contentWidth) {
+                    position = 0;
+                }
+                
+                element.style.transform = `translateX(${position}px)`;
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        });
+    }
+    
+    const marqueeElements = document.querySelectorAll('.marquee-content');
+    marqueeElements.forEach(setupMarquee);
+});
+
     let personalTitlesUpdates = [];
     let stationsToDelete = [];
 
@@ -61,12 +102,10 @@ SETTINGS
         const stationuuid = inputElement.getAttribute('data-stationuuid');
         const personalTitle = inputElement.value;
 
-        // Remove any existing update for this station
         personalTitlesUpdates = personalTitlesUpdates.filter(
             update => update.stationuuid !== stationuuid
         );
 
-        // Add new update
         personalTitlesUpdates.push({
             stationuuid: stationuuid,
             personalTitle: personalTitle
@@ -88,17 +127,15 @@ SETTINGS
     }
 
     function playStation(stationuuid) {
-        // Fetch stations from station_scope.json to find the correct index
+
         fetch('/state/station_scope.json')
             .then(response => response.json())
             .then(stations => {
-                // Find the index of the station with the matching stationuuid
                 const stationIndex = stations.findIndex(
                     station => station.stationuuid === stationuuid
                 );
 
                 if (stationIndex !== -1) {
-                    // Add 1 to the index because the route uses 1-based indexing
                     return fetch(`/radios/play/${stationIndex + 1}`);
                 } else {
                     throw new Error('Station not found');
@@ -132,7 +169,6 @@ SETTINGS
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Remove staged-for-deletion elements
                     stationsToDelete.forEach(stationuuid => {
                         const stationElement = document.querySelector(`input[data-stationuuid="${stationuuid}"]`).closest('li');
                         if (stationElement) {
@@ -140,7 +176,6 @@ SETTINGS
                         }
                     });
 
-                    // Reset update tracking
                     personalTitlesUpdates = [];
                     stationsToDelete = [];
 
@@ -159,12 +194,10 @@ SETTINGS
         const stationuuid = inputElement.getAttribute('data-stationuuid');
         const personalTitle = inputElement.value;
 
-        // Remove any existing update for this station
         personalTitlesUpdates = personalTitlesUpdates.filter(
             update => update.stationuuid !== stationuuid
         );
 
-        // Add new update
         personalTitlesUpdates.push({
             stationuuid: stationuuid,
             personalTitle: personalTitle

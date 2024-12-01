@@ -91,13 +91,17 @@
     });
 
 
-
+    function getRandomEmoji() {
+        const emojis = ["✌️", "🤙", "🤟", "🤌", "🫰", "🫵", "💪", "💆‍♀️", "🕺", "💃", "🥊"];
+        const randomIndex = Math.floor(Math.random() * emojis.length);
+        return emojis[randomIndex];
+    }
 
     function addToFavorites(name, stationuuid) {
         const data = {
             name: name,
             stationuuid: stationuuid,
-            personal_title: "i kind of liked it", 
+            personal_title: getRandomEmoji(),
             is_it_live: true // TODO: check dynamically
         };
 

@@ -326,7 +326,7 @@ ul .radios-list li {
     color: black;
 }
 
-.radio-dtl-wrapper #radio-play-text {
+.radio-dtl-wrapper #radio-play-text, .radio-dtl-wrapper #add-radio-to-fav {
     text-transform: lowercase;
     margin-top: 1rem;
     text-decoration: underline 0.5rem;
@@ -370,10 +370,12 @@ ul .radios-list li {
     cursor: pointer;
     border-radius: 0; /* iOS */
     flex-grow: 1;
+    border: none;
 }
 
 .slider-control input[type="range"]::-webkit-slider-runnable-track {
     background: #e1e1e1;
+    border: none;
 }
 
 .slider-control input[type="range"]::-webkit-slider-thumb {
@@ -381,18 +383,21 @@ ul .radios-list li {
     width: 2rem;
     height: 5rem;
     background: white;
+    border: none;
     box-shadow: -20000px 0 0 20000px black;
 }
 
 .slider-control input[type="range"]::-moz-range-track {
     height: 5rem;
     background: #e1e1e1;;
+    border: none;
 }
 
 .slider-control input[type="range"]::-moz-range-thumb {
     height: 5rem;
     background: white;
     width: 2rem;
+    border: none;
     border-radius: 0 !important;
     box-shadow: -20000px 0 0 20000px black;
     box-sizing: border-box;
@@ -404,7 +409,7 @@ ul .radios-list li {
 
 .slider-control input[type="range"]::-ms-thumb { 
     background: greenyellow;
-    border: 400px solid #999;
+    border: none;
     height: 40px;
     width: 20px;
     box-sizing: border-box;
@@ -423,45 +428,41 @@ ul .radios-list li {
 
 .favorite-stations {
     margin-top: 2rem;
+    position: relative; /* For positioning the save button */
 }
 
-.favorite-stations * {
+.favorite-stations *{
     font-family: inherit;
     font-size: inherit;
-    font-weight: 800;
+    font-weight: inherit;
 }
 
-
-.favorite-stations ul {
-    margin-block: 2rem;
-    list-style-type: none;
-}
-
-.favorite-stations li {
-    margin-block: 0.5rem;
+.favorite-stations-header {
     display: flex;
     align-items: center;
-    background-color: #fff;
+    position: sticky;
+    top: 0;
+    background-color: white; 
+    z-index: 10;
+    margin-bottom: 1rem;
 }
 
-.favorite-stations li span {
-    flex-grow: 1;
-    margin-right: 1rem;
-    font-weight: bold;
+.favorite-stations-header h2 {
+    margin-right: auto; 
 }
 
-.favorite-stations li input {
-    flex-grow: 2;
-    padding: 0.8rem;
-    border: none;
+.save-btn:hover {
+    background-color: black;
+    color: white;
 }
 
 .save-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
     font-family: inherit;
     font-weight: inherit;
-    font-size: 2rem;
-    margin-top: 1rem;
-    padding: 0.8rem 1rem;
+    padding: 0.5rem 1rem;
     background-color: white;
     color: black;
     border: 0.5rem solid black;
@@ -469,10 +470,72 @@ ul .radios-list li {
     transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.save-btn:hover {
-    background-color: black;
-    color: white;
+.favorite-stations ul {
+    margin-block: 2rem;
+    list-style-type: none;
 }
+
+.favorite-stations li {
+    transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    margin-block: 0.5rem;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+}
+
+.favorite-stations li:hover {
+    border-bottom: 0.5rem solid black;
+    margin-bottom: -0.5rem;
+}
+
+.station-live-indicator {
+    flex-shrink: 0; /* prevent shrinking */
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    margin-right: 1rem;
+    border: 0.2rem solid black;
+}
+
+.favorite-stations li .marquee-container, 
+.favorite-stations li input {
+    flex: 1; 
+    min-width: 0; 
+}
+
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.marquee-content {
+    white-space: nowrap;
+    display: inline-block;
+    opacity: 0; 
+}
+
+.marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+}
+
+/* General styling for the input */
+input[type="text"] {
+    border: none; 
+    outline: none; 
+    background: transparent;
+    color: inherit; 
+    font: inherit; 
+    margin-inline: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="text"]:active {
+    outline: 0.5rem solid black; 
+}
+
+
+
 
 .station-live-indicator {
     width: 1rem;
@@ -506,7 +569,7 @@ ul .radios-list li {
 }
 
 .staged-for-deletion {
+    transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     opacity: 0.2;
-    text-decoration: line-through 0.2rem;
 }
 

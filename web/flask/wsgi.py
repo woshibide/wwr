@@ -50,8 +50,6 @@ def save_user_settings(data):
         json.dump(data, file, indent=4)
 
 
-
-
 # --------------------------------------------------
 # ------------------- ENDPOINTS --------------------
 # --------------------------------------------------
@@ -66,10 +64,9 @@ def serve_state_file(filename):
 
 @app.route('/radios/play/<int:radio_num>', methods=['GET'])
 def play_radio(radio_num):
-    """
-        endpoint to play radio stream
-
-    """
+#                                                           #
+#   endpoint to play radio stream                           #
+#                                                           #
     stations = load_json(STATION_JSON_PATH)
     
     if radio_num < 1 or radio_num > len(stations):
@@ -108,11 +105,12 @@ def play_radio(radio_num):
 #      when rendering names some characters can be dropped, what is really needed is . and ()
 
 # TODO: check if after pressing "add" button the change to favorites list needs to be propagated into the json
+
 def add_favorite():
-    """
-        endpoint to add a radio station to the favorites list.
-        
-    """
+#                                                           #
+#   endpoint to add a radio station to the favorites list   #
+#                                                           #
+
     data = request.json
     station_name = data.get('name')
     station_uuid = data.get('stationuuid')
@@ -156,10 +154,11 @@ def index():
 def radios():
     # TODO: cache the result
     # TODO: load html and then display currently working stations
+    # TODO: upon scrolling down to fetch more stations
 
     stations = load_json(STATION_JSON_PATH)
     
-    stations_working = len(stations) # not true, some are broken and its those are fetched
+    stations_working = len(stations) # not true, some are broken
     logging.info(f"loaded {stations_working} stations") 
 
     return render_template('radios.html', stations_working=stations_working, stations=stations)
@@ -196,6 +195,9 @@ def user_settings():
             logging.info(f"Received data: {data}")
 
             # volume update
+            # BUG: somehow for a peculiar reason if volume bar is played with it deletes all favorite stations
+            #  
+
             if 'volume' in data:
                 volume = int(data['volume'])
                 settings['User Settings'][0]['volume'] = volume
@@ -229,7 +231,7 @@ def user_settings():
             with open(USER_SETTINGS_PATH, 'w', encoding='utf-8') as f:
                 json.dump(settings, f, indent=4)
 
-            return jsonify({"status": "success"}) # TODO: to display via frontend
+            return jsonify({"status": "success"}) # TODO: to display via frontend nicely
         
         except Exception as e:
             logging.error(f"Error processing settings: {e}")

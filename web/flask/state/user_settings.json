@@ -1,22 +1,8 @@
 {
     "User Settings": [
         {
-            "last_station_uuid": "4fada307-69a7-4a7f-9b8d-027836672e84",
-            "volume": 41
-        }
-    ],
-    "Favourite Stations": [
-        {
-            "name": "\tBBC Radio 3 Unwind",
-            "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
-            "personal_title": "i like this one a lot",
-            "is_it_live": true
-        },
-        {
-            "name": " Exclusively Whitney Houston ",
-            "stationuuid": "ef2dac34-be6c-4f6f-9408-88947e0219cb",
-            "personal_title": "i kinda of liked it",
-            "is_it_live": true
+            "last_station": "",
+            "volume": 100
         }
     ]
 }
