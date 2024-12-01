@@ -1,0 +1,58 @@
+{
+    "User Settings": [
+        {
+            "last_station_uuid": "cf670706-e552-4ffd-b0fc-0a3b55315cf6",
+            "volume": 41
+        }
+    ],
+    "Favourite Stations": [
+        {
+            "name": "\tBBC Radio 3 Unwind",
+            "stationuuid": "5369df17-e9f4-43db-959a-d02300558f60",
+            "personal_title": "i like this one a lot",
+            "is_it_live": true
+        },
+        {
+            "name": " Exclusively Whitney Houston ",
+            "stationuuid": "ef2dac34-be6c-4f6f-9408-88947e0219cb",
+            "personal_title": "i kinda of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": " Radio Gameplay ",
+            "stationuuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": ". \u0645\u062e\u062a\u0635\u0631 \u0627\u0644\u0633\u064a\u0631\u0629",
+            "stationuuid": "367578fd-4670-4956-8699-4d12c962b292",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": "1000 HITS Classical",
+            "stationuuid": "cf670706-e552-4ffd-b0fc-0a3b55315cf6",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": " Exclusively Madonna",
+            "stationuuid": "319a9758-9b6b-4aa6-8415-432e43c46d1e",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": "__HAPPY HARDCORE__ by rautemusik (rm.fm)",
+            "stationuuid": "b9fad3b3-f66e-4ede-84e5-0d4641aabb66",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        },
+        {
+            "name": "2AC\u6fb3\u6d32\u534e\u4eba\u7535\u53f0",
+            "stationuuid": "e31b6087-fd58-4757-aed3-41f8b47b9b5d",
+            "personal_title": "i kind of liked it",
+            "is_it_live": true
+        }
+    ]
+}
