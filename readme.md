@@ -14,3 +14,5 @@ if one part of the program fails it doesnt affect execution of the rest
 
 volume control updates so fast it deletes user's favorite stations settings, lol 
 
+`wget-log` makes me paranoid, i have no clue how come that file appears 
+
