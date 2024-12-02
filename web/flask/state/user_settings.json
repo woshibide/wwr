@@ -2,7 +2,7 @@
     "User Settings": [
         {
             "last_station_uuid": "cf670706-e552-4ffd-b0fc-0a3b55315cf6",
-            "volume": 48
+            "volume": 95
         }
     ],
     "Favourite Stations": [
@@ -47,6 +47,12 @@
             "stationuuid": "e31b6087-fd58-4757-aed3-41f8b47b9b5d",
             "personal_title": "i kind of liked it",
             "is_it_live": null
+        },
+        {
+            "name": " La SuperSonica",
+            "stationuuid": "6573a081-63e1-4951-987d-94607ffedad8",
+            "personal_title": "\ud83e\udd1f",
+            "is_it_live": true
         }
     ]
 }
