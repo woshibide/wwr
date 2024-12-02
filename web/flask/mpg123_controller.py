@@ -57,16 +57,17 @@ class MPG123Controller:
             # start mpg123 with more robust buffering options
             self.current_process = subprocess.Popen([
                 'mpg123',
-                '--keep-open',  # keep the process running even if stream ends
-                #'-b', '4096',   # larger buffer size
-                '--timeout', '10',  # longer network timeout
                 '-R',          # remote control mode
-                'v',           # verbose output
+                '-a', 'hw:1,0', # audio output for speaker on arduino
+                'm',            # monolize output
+                '--keep-open',  # keep the process running even if stream ends
+                'preload', '0.3',   # 
+                '--timeout', '10',  # longer network timeout
                 '--fifo', self.fifo_path,
             ], stdin=subprocess.PIPE, 
                stdout=subprocess.PIPE, 
                stderr=subprocess.PIPE,
-               bufsize=1)  # line buffered
+               bufsize=0)  # line buffered
             
             # start output monitoring threads
             self.is_running = True
