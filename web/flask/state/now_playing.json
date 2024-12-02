@@ -1,10 +1,10 @@
 {
     "current_station": {
         "is_playing": true,
-        "name": "\nRADIO MARIAM ARABIC\n",
-        "personal_title": null,
-        "stationuuid": "c4de7d17-ae8c-4068-94a8-02e6156ef5cc",
-        "url": "http://dreamsiteradiocp4.com:8046/stream",
-        "volume": 26
+        "name": " Radio Gameplay ",
+        "personal_title": "kind of trash but i like it",
+        "stationuuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
+        "url": "https://c22.radioboss.fm:8144/GamePlay",
+        "volume": 61
     }
 }

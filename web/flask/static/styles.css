@@ -129,7 +129,7 @@ main {
     background-color: white;
     color: black;
     padding: 4rem;
-    padding-top: 50svh;
+    padding-top: 45svh;
     z-index: 9999;
     overflow: hidden;
 }
@@ -207,8 +207,9 @@ TODO: make it work for underline hovers
     --panel-height: 20svh;
     position: fixed;
     top: calc(-1 * var(--panel-height)); /* start fully off-screen */
-    right: 2rem;
-    padding-left: 6rem;
+    /* right: 2rem; */
+    margin: 0rem 6rem 6rem 8rem;
+    padding: 2rem;
     width: 80svw;
     height: var(--panel-height);
     background: transparent;
@@ -219,7 +220,12 @@ TODO: make it work for underline hovers
 }
 
 .now-playing-panel.active {
-    top: 4rem;
+    top: 1rem;
+}
+
+/* disable animation in open state on new page load */
+.now-playing-panel.no-animation {
+    transition: none;
 }
 
 .now-playing-toggle {
@@ -243,8 +249,21 @@ TODO: make it work for underline hovers
     transform: scale(1.1);
 }
 
+/* animation for when music is playing */
+.now-playing-toggle.playing {
+    animation: pulse-wiggle 1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite
+}
+
+@keyframes pulse-wiggle {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+}
+}
 .now-playing-content {
-    padding-right: 3rem;
+    width: auto;
 }
 
 .playback-controls {
@@ -768,4 +787,3 @@ input[type="text"]:active {
     transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     opacity: 0.2;
 }
-

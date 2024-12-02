@@ -91,17 +91,24 @@
     });
 
 
-    function getRandomEmoji() {
+    function composeEmojis() {
+
         const emojis = ["✌️", "🤙", "🤟", "🤌", "🫰", "🫵", "💪", "💆‍♀️", "🕺", "💃", "🥊"];
-        const randomIndex = Math.floor(Math.random() * emojis.length);
-        return emojis[randomIndex];
+        const selectedEmojis = [];
+
+        for (let j = 0; j < 3; j++) {
+            const randomIndex = Math.floor(Math.random() * emojis.length);
+            selectedEmojis.push(emojis[randomIndex]);
+        }
+
+        return selectedEmojis.join('');
     }
 
     function addToFavorites(name, stationuuid) {
         const data = {
             name: name,
             stationuuid: stationuuid,
-            personal_title: getRandomEmoji(),
+            personal_title: composeEmojis(),
             is_it_live: true // TODO: check dynamically
         };
 

@@ -33,6 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeSlider = document.getElementById('volumeSlider');
     const nowPlayingMarquee = document.getElementById('nowPlayingMarquee');
     
+    // add no-animation class on page load
+    nowPlayingPanel.classList.add('no-animation');
+    
+    // check stored state on page load
+    // get stored panel state
+    const isPanelOpen = localStorage.getItem('nowPlayingPanelOpen') === 'true';
+    
+    // apply stored state
+    if (isPanelOpen) {
+        nowPlayingPanel.classList.add('active');
+    }
+    
     // update now playing info
     async function updateNowPlaying() {
         try {
@@ -53,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const pauseIcon = pauseButton.querySelector('.pause-icon');
             pauseIcon.classList.toggle('playing', !station.is_playing);
             
+            // update toggle button animation
+            nowPlayingToggle.classList.toggle('playing', station.is_playing);
+            
             // update volume
             volumeSlider.value = station.volume;
         } catch (error) {
@@ -64,9 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
     updateNowPlaying();
     setInterval(updateNowPlaying, 1000);
     
-    // toggle panel
+    // toggle panel and store state
     nowPlayingToggle?.addEventListener('click', () => {
         nowPlayingPanel.classList.toggle('active');
+        
+        // remove no-animation class when toggled
+        nowPlayingPanel.classList.remove('no-animation');
+        
+        // store current state
+        const isOpen = nowPlayingPanel.classList.contains('active');
+        localStorage.setItem('nowPlayingPanelOpen', isOpen);
     });
     
     // handle pause/play
@@ -78,13 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let result;
             if (isCurrentlyPlaying) {
-                // if playing, pause it
-                result = await fetch('/audio/pause', {
+                // if playing, stop it
+                result = await fetch('/audio/stop', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
             } else {
-                // if paused, play it using existing radio endpoint
+                // if stopped, play it using existing radio endpoint
                 const stations = await fetch('/state/station_scope.json').then(r => r.json());
                 const stationUuid = data.current_station.stationuuid;
                 const stationIndex = stations.findIndex(s => s.stationuuid === stationUuid);

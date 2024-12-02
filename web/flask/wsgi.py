@@ -13,6 +13,7 @@ functionality would include:
  when post request is sent and want to go back it actually sends post request again 
 """
 
+# web/flask/wsgi.py
 import os
 import json
 import logging
@@ -20,6 +21,7 @@ from logging.handlers import RotatingFileHandler
 from audio_player import AudioPlayer
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from radio_api.lookup_radios import downloadRadiobrowserStats, check_stations_batch
+from config import STATION_JSON_PATH, USER_SETTINGS_PATH, NOW_PLAYING_PATH, STATE_DIR
 
 # create logs directory if it doesn't exist
 os.makedirs('logs', exist_ok=True)
@@ -31,7 +33,7 @@ logging.basicConfig(
     format=log_format,
     handlers=[
         RotatingFileHandler(
-            'logs/app.log', maxBytes=5*1024*1024, backupCount=5  # 5MB max size, keep 5 backups
+            'logs/app.log', maxBytes=5*1024*1024, backupCount=5
         ),
         logging.StreamHandler()
     ]
@@ -42,24 +44,16 @@ logger = logging.getLogger(__name__)
 # werkzeug 
 werkzeug_logger = logging.getLogger('werkzeug')
 werkzeug_logger.setLevel(logging.DEBUG)
-werkzeug_logger.propagate = False  # Prevent duplicate log messages
+werkzeug_logger.propagate = False
 werkzeug_logger.addHandler(
     RotatingFileHandler(
-        'logs/werkzeug.log', maxBytes=5*1024*1024, backupCount=5  # Separate file for Werkzeug logs
+        'logs/werkzeug.log', maxBytes=5*1024*1024, backupCount=5
     )
 )
-
 
 app = Flask(__name__)
 audio_player = AudioPlayer()
 
-# this is temporary change for mac os development
-# STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
-# USER_SETTINGS_PATH = os.path.expanduser('~/wwr/web/flask/state/user_settings.json')
-STATION_JSON_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/station_scope.json')
-USER_SETTINGS_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/user_settings.json')
-STATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state')
-NOW_PLAYING_PATH = os.path.join(STATE_DIR, 'now_playing.json')
 
 # --------------------------------------------------
 # ----------------- HANDY FUNCY --------------------
@@ -126,6 +120,7 @@ def play_radio(radio_num):
         })
         
         # check for personal title in favorites
+        # why tho...?
         for fav in user_settings.get('Favourite Stations', []):
             if fav['stationuuid'] == station_uuid:
                 now_playing['current_station']['personal_title'] = fav.get('personal_title')
@@ -143,26 +138,46 @@ def play_radio(radio_num):
 
 
 
-@app.route('/audio/pause', methods=['POST'])
-#                                                           #
-#           endpoint to pause radio stream                  #
-#                                                           #
-
-def pause_playback():
+@app.route('/audio/stop', methods=['POST'])
+def stop_playback():
+    """endpoint to stop radio stream"""
     try:
-        # toggle pause/resume
-        if audio_player.pause_stream():
-            # update state
-            now_playing = load_json(NOW_PLAYING_PATH)
-            now_playing['current_station']['is_playing'] = not audio_player.is_paused
-            with open(NOW_PLAYING_PATH, 'w') as f:
-                json.dump(now_playing, f, indent=4)
-            return jsonify({"status": "success", "is_playing": not audio_player.is_paused})
-        else:
-            raise RuntimeError("failed to toggle pause state")
+        # stop playback
+        audio_player.stop_stream()
+        
+        # update state
+        now_playing = load_json(NOW_PLAYING_PATH)
+        now_playing['current_station']['is_playing'] = False
+        with open(NOW_PLAYING_PATH, 'w') as f:
+            json.dump(now_playing, f, indent=4)
+            
+        return jsonify({"status": "success"})
     except Exception as e:
-        logger.error(f"failed to toggle pause: {e}")
+        logger.error(f"failed to stop playback: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+
+# @app.route('/audio/pause', methods=['POST'])
+# #                                                           #
+# #           endpoint to pause radio stream                  #
+# #                                                           #
+
+# def pause_playback():
+#     try:
+#         # toggle pause/resume
+#         if audio_player.pause_stream():
+#             # update state
+#             now_playing = load_json(NOW_PLAYING_PATH)
+#             now_playing['current_station']['is_playing'] = not audio_player.is_paused
+#             with open(NOW_PLAYING_PATH, 'w') as f:
+#                 json.dump(now_playing, f, indent=4)
+#             return jsonify({"status": "success", "is_playing": not audio_player.is_paused})
+#         else:
+#             raise RuntimeError("failed to toggle pause state")
+#     except Exception as e:
+#         logger.error(f"failed to toggle pause: {e}")
+#         return jsonify({"error": str(e)}), 500
 
 
 
@@ -228,8 +243,8 @@ def add_favorite():
     new_station = {
         "name": station_name,
         "stationuuid": station_uuid,
-        "personal_title": data.get('personal_title', ''),
-        "is_it_live": data.get('is_it_live', True) # TODO: dynamically check if station is live
+        "personal_title": data.get('personal_title', ''), # in case front end fails
+        "is_it_live": data.get('is_it_live', True)
     }
     
     favorite_stations.append(new_station)
@@ -415,6 +430,7 @@ def update_audio_settings():
         return jsonify({"status": "success"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
+
 
 
 

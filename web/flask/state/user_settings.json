@@ -1,8 +1,8 @@
 {
     "User Settings": [
         {
-            "last_station_uuid": "c4de7d17-ae8c-4068-94a8-02e6156ef5cc",
-            "volume": 73
+            "last_station_uuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
+            "volume": 61
         }
     ],
     "Favourite Stations": [
@@ -52,6 +52,18 @@
             "name": " La SuperSonica",
             "stationuuid": "6573a081-63e1-4951-987d-94607ffedad8",
             "personal_title": "\ud83e\udd1f",
+            "is_it_live": true
+        },
+        {
+            "name": "(((EBM-Radio)))",
+            "stationuuid": "eedf60d7-37ec-43be-83b4-60da70d0b22b",
+            "personal_title": "\ud83d\udcaa",
+            "is_it_live": true
+        },
+        {
+            "name": ".\u0627\u0644\u0642\u0631\u0622\u0646",
+            "stationuuid": "7d65c355-a932-4279-bfec-57d5eacecd3c",
+            "personal_title": "\ud83e\udef0\ud83e\udd0c\ud83e\udd1f",
             "is_it_live": true
         }
     ]
