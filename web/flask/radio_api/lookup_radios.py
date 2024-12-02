@@ -12,12 +12,13 @@ import urllib
 import json
 import ssl
 import logging
+import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 
-logging.basicConfig(
-    # INFO, DEBUG, ERROR
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+
+logger = logging.getLogger(__name__)
 
 def get_radiobrowser_base_urls():
     """
@@ -43,11 +44,11 @@ def get_radiobrowser_base_urls():
         hosts.sort()
         # Add "https://" in front to make it a URL
         base_urls = list(map(lambda x: "https://" + x, hosts))
-        logging.debug(f"Base URLs retrieved: {base_urls}")
+        logger.debug(f"Base URLs retrieved: {base_urls}")
         return base_urls
 
     except Exception as e:
-        logging.error(f"Error getting Radio Browser base URLs: {e}")
+        logger.error(f"Error getting Radio Browser base URLs: {e}")
         return []
 
 def downloadUri(uri, param):
@@ -64,9 +65,9 @@ def downloadUri(uri, param):
     param_encoded = None
     if param is not None:
         param_encoded = json.dumps(param).encode('utf-8')
-        logging.info(f"Request to {uri} with Params: {param}")
+        logger.info(f"Request to {uri} with Params: {param}")
     else:
-        logging.info(f"Request to {uri} with no parameters")
+        logger.info(f"Request to {uri} with no parameters")
 
     req = urllib.request.Request(uri, data=param_encoded)
 
@@ -79,10 +80,10 @@ def downloadUri(uri, param):
     try:
         with urllib.request.urlopen(req, context=context) as response:
             data = response.read()
-            logging.debug(f"Data received from {uri}")
+            logger.debug(f"Data received from {uri}")
             return data
     except Exception as e:
-        logging.error(f"Error downloading data from {uri}: {e}")
+        logger.error(f"Error downloading data from {uri}: {e}")
         raise
 
 def downloadRadiobrowser(path, param):
@@ -100,16 +101,16 @@ def downloadRadiobrowser(path, param):
     servers = get_radiobrowser_base_urls()
     random.shuffle(servers)
     for i, server_base in enumerate(servers):
-        logging.info(f"Attempt {i+1}: Trying server {server_base}")
+        logger.info(f"Attempt {i+1}: Trying server {server_base}")
         uri = server_base + path
 
         try:
             data = downloadUri(uri, param)
             return data
         except Exception as e:
-            logging.warning(f"Unable to download from API URL: {uri}. Error: {e}")
+            logger.warning(f"Unable to download from API URL: {uri}. Error: {e}")
             continue
-    logging.error("Failed to retrieve data from all servers.")
+    logger.error("Failed to retrieve data from all servers.")
     return None  # To indicate failure
 
 def downloadRadiobrowserStats():
@@ -122,10 +123,10 @@ def downloadRadiobrowserStats():
     stats = downloadRadiobrowser("/json/stats", None)
     if stats is not None:
         stats_json = json.loads(stats)
-        logging.debug(f"Stats received: {stats_json}")
+        logger.debug(f"Stats received: {stats_json}")
         return stats_json
     else:
-        logging.error("Failed to retrieve stats from all servers.")
+        logger.error("Failed to retrieve stats from all servers.")
         return None
 
 def downloadRadiobrowserStationsByCountry(countrycode):
@@ -141,10 +142,10 @@ def downloadRadiobrowserStationsByCountry(countrycode):
     stations = downloadRadiobrowser(f"/json/stations/bycountrycodeexact/{countrycode}", None)
     if stations:
         stations_json = json.loads(stations)
-        logging.debug(f"Stations received for country {countrycode}: {stations_json}")
+        logger.debug(f"Stations received for country {countrycode}: {stations_json}")
         return stations_json
     else:
-        logging.error(f"Failed to retrieve stations for country code {countrycode}")
+        logger.error(f"Failed to retrieve stations for country code {countrycode}")
         return []
 
 def downloadRadiobrowserStationsByName(name):
@@ -160,16 +161,66 @@ def downloadRadiobrowserStationsByName(name):
     stations = downloadRadiobrowser("/json/stations/search", {"name": name})
     if stations:
         stations_json = json.loads(stations)
-        logging.debug(f"Stations received with name {name}: {stations_json}")
+        logger.debug(f"Stations received with name {name}: {stations_json}")
         return stations_json
     else:
-        logging.error(f"Failed to retrieve stations with name {name}")
+        logger.error(f"Failed to retrieve stations with name {name}")
         return []
+
+def check_station_status(station_url, timeout=2):
+    """check if a radio station is live by testing its stream"""
+    try:
+        # configure session with retry strategy
+        session = requests.Session()
+        retries = Retry(total=1, backoff_factor=0.1)
+        session.mount('http://', HTTPAdapter(max_retries=retries))
+        session.mount('https://', HTTPAdapter(max_retries=retries))
+        
+        # only get the headers to check if stream is accessible
+        response = session.head(
+            station_url, 
+            timeout=timeout,
+            allow_redirects=True
+        )
+        
+        # check if response is successful and content type is audio
+        is_live = (
+            response.status_code == 200 and
+            'audio' in response.headers.get('content-type', '').lower()
+        )
+        
+        logger.debug(f"station status check - url: {station_url}, live: {is_live}")
+        return is_live
+        
+    except Exception as e:
+        logger.debug(f"failed to check station status - url: {station_url}, error: {str(e)}")
+        return False
+
+def check_stations_batch(stations, max_workers=10):
+    """check multiple stations status in parallel"""
+    results = {}
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_uuid = {
+            executor.submit(check_station_status, station['url']): station['stationuuid']
+            for station in stations
+        }
+        
+        for future in as_completed(future_to_uuid):
+            station_uuid = future_to_uuid[future]
+            try:
+                is_live = future.result()
+                results[station_uuid] = is_live
+            except Exception as e:
+                logger.error(f"error checking station {station_uuid}: {e}")
+                results[station_uuid] = False
+    
+    return results
 
 if __name__ == "__main__":
     # Example usage and output
-    logging.info("Stats")
-    logging.info("------------")
+    logger.info("Stats")
+    logger.info("------------")
     stats = downloadRadiobrowserStats()
     if stats:
         print(json.dumps(stats, indent=4))
@@ -177,8 +228,8 @@ if __name__ == "__main__":
         print("No stats available.")
 
     # Uncomment the following lines to fetch station info
-    logging.info("Station Info")
-    logging.info("------------")
+    logger.info("Station Info")
+    logger.info("------------")
     stations = downloadRadiobrowserStationsByName("Silver Rain")
     if stations:
         print(json.dumps(stations, indent=4))

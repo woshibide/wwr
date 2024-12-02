@@ -13,16 +13,6 @@ SETTINGS
                 oninput="updateVolume(this.value)" />
             <span id="volume-display">{{ settings['User Settings'][0]['volume'] }}%</span>
         </div>
-        <div class="slider-control">
-            <label for="bass">bass</label>
-            <input id="bass" type="range" min="0" max="100" value="{{ settings['User Settings'][0]['volume'] }}" />
-            <span id="bass-display">{{ settings['User Settings'][0]['volume'] }}%</span>
-        </div>
-        <div class="slider-control">
-            <label for="tremble">tremble</label>
-            <input id="tremble" type="range" min="0" max="100" value="{{ settings['User Settings'][0]['volume'] }}" />
-            <span id="tremble-display">{{ settings['User Settings'][0]['volume'] }}%</span>
-        </div>
     </div>
 
 
@@ -34,22 +24,22 @@ SETTINGS
         <ul>
             {% for station in settings['Favourite Stations'] %}
             <li>
-                <div class="station-live-indicator {% if station['is_it_live'] %}live{% endif %}"></div>
                 <div class="marquee-container">
                     <div class="marquee-content" id="marqueeContent">{{ station['name'] }}&ensp;&ensp;&ensp;{{ station['name'] }}&ensp;&ensp;&ensp;</div>
                 </div>
                 <input type="text" value="{{ station['personal_title'] }}"
-                    data-stationuuid="{{ station['stationuuid'] }}" oninput="markForUpdate(this)" />
+                data-stationuuid="{{ station['stationuuid'] }}" oninput="markForUpdate(this)" />
                 <div class="station-actions">
                     <button class="delete-btn" onclick="confirmDeleteStation('{{ station['stationuuid'] }}')"
-                        title="remove from favorites">
-                        🗑️
-                    </button>
-                    <button class="play-btn" onclick="playStation('{{ station['stationuuid'] }}')"
-                        title="play this station">
-                        PLAY
-                    </button>
-                </div>
+                    title="remove from favorites">
+                    🗑️
+                </button>
+                <button class="play-btn" onclick="playStation('{{ station['stationuuid'] }}')"
+                title="play this station">
+                PLAY
+            </button>
+        </div>
+        <div class="station-live-indicator {% if station['is_it_live'] %}live{% endif %}"></div>
             </li>
             {% endfor %}
         </ul>
@@ -207,7 +197,7 @@ SETTINGS
     function updateVolume(value) {
         document.getElementById('volume-display').textContent = `${value}%`;
 
-        fetch('/settings', {
+        fetch('/audio/settings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -224,6 +214,41 @@ SETTINGS
                 console.error('Error updating volume:', error);
             });
     }
+
+    // check stations status periodically
+    function updateStationsStatus() {
+        fetch('/check_stations_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(statusResults => {
+            // update live indicators
+            Object.entries(statusResults).forEach(([stationuuid, isLive]) => {
+                const indicator = document.querySelector(
+                    `[data-stationuuid="${stationuuid}"]`
+                ).closest('li').querySelector('.station-live-indicator');
+                
+                if (isLive) {
+                    indicator.classList.add('live');
+                } else {
+                    indicator.classList.remove('live');
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error checking stations status:', error);
+        });
+    }
+
+    // check status every 2 minutes
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStationsStatus(); // initial check
+        setInterval(updateStationsStatus, 60000); // check every minute
+    });
+
 </script>
 
 {% endblock %}
