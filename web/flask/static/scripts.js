@@ -26,7 +26,117 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // TODO:dont really work, need to fix
+    // now playing panel
+    const nowPlayingPanel = document.querySelector('.now-playing-panel');
+    const nowPlayingToggle = document.getElementById('now-playing-toggle');
+    const pauseButton = document.getElementById('pauseButton');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const nowPlayingMarquee = document.getElementById('nowPlayingMarquee');
+    
+    // update now playing info
+    async function updateNowPlaying() {
+        try {
+            const response = await fetch('/now_playing');
+            const data = await response.json();
+            const station = data.current_station;
+            
+            // update station info
+            if (station.name) {
+                nowPlayingMarquee.textContent = station.name;
+                nowPlayingPanel.classList.add('has-content');
+            } else {
+                nowPlayingMarquee.textContent = 'Nothing playing';
+                nowPlayingPanel.classList.remove('has-content');
+            }
+            
+            // update play/pause state
+            const pauseIcon = pauseButton.querySelector('.pause-icon');
+            pauseIcon.classList.toggle('playing', !station.is_playing);
+            
+            // update volume
+            volumeSlider.value = station.volume;
+        } catch (error) {
+            console.debug('Error updating now playing:', error);
+        }
+    }
+    
+    // update now playing info periodically
+    updateNowPlaying();
+    setInterval(updateNowPlaying, 1000);
+    
+    // toggle panel
+    nowPlayingToggle?.addEventListener('click', () => {
+        nowPlayingPanel.classList.toggle('active');
+    });
+    
+    // handle pause/play
+    pauseButton?.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/now_playing');
+            const data = await response.json();
+            const isCurrentlyPlaying = data.current_station.is_playing;
+            
+            let result;
+            if (isCurrentlyPlaying) {
+                // if playing, pause it
+                result = await fetch('/audio/pause', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } else {
+                // if paused, play it using existing radio endpoint
+                const stations = await fetch('/state/station_scope.json').then(r => r.json());
+                const stationUuid = data.current_station.stationuuid;
+                const stationIndex = stations.findIndex(s => s.stationuuid === stationUuid);
+                
+                if (stationIndex !== -1) {
+                    result = await fetch(`/radios/play/${stationIndex + 1}`);
+                } else {
+                    throw new Error('station not found');
+                }
+            }
+            
+            if (result.ok) {
+                updateNowPlaying();
+            }
+        } catch (error) {
+            console.error('Error toggling playback:', error);
+        }
+    });
+    
+    // handle volume
+    let volumeTimeout;
+    volumeSlider?.addEventListener('input', (e) => {
+        const value = e.target.value;
+        
+        // update display immediately
+        if (document.getElementById('volume-display')) {
+            document.getElementById('volume-display').textContent = `${value}%`;
+        }
+        
+        // update now playing state
+        fetch('/now_playing').then(response => response.json())
+            .then(data => {
+                data.current_station.volume = parseInt(value);
+                return fetch('/state/now_playing.json', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            })
+            .catch(error => console.debug('Error updating now playing volume:', error));
+        
+        // debounce volume api call
+        clearTimeout(volumeTimeout);
+        volumeTimeout = setTimeout(() => {
+            fetch('/audio/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ volume: parseInt(value) })
+            });
+        }, 100);
+    });
+
     // page transitions
     const overlay = document.querySelector('.page-overlay');
     

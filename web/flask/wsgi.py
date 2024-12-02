@@ -19,23 +19,39 @@ import logging
 from logging.handlers import RotatingFileHandler
 from audio_player import AudioPlayer
 from flask import Flask, render_template, request, jsonify, send_from_directory
-
 from radio_api.lookup_radios import downloadRadiobrowserStats, check_stations_batch
 
-app = Flask(__name__)
-audio_player = AudioPlayer()
+# create logs directory if it doesn't exist
 os.makedirs('logs', exist_ok=True)
+
+log_format = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
 
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format=log_format,
     handlers=[
-        RotatingFileHandler('logs/app.log', maxBytes=1024*1024, backupCount=5),
+        RotatingFileHandler(
+            'logs/app.log', maxBytes=5*1024*1024, backupCount=5  # 5MB max size, keep 5 backups
+        ),
         logging.StreamHandler()
     ]
 )
 
 logger = logging.getLogger(__name__)
+
+# werkzeug 
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.DEBUG)
+werkzeug_logger.propagate = False  # Prevent duplicate log messages
+werkzeug_logger.addHandler(
+    RotatingFileHandler(
+        'logs/werkzeug.log', maxBytes=5*1024*1024, backupCount=5  # Separate file for Werkzeug logs
+    )
+)
+
+
+app = Flask(__name__)
+audio_player = AudioPlayer()
 
 # this is temporary change for mac os development
 # STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
@@ -43,6 +59,7 @@ logger = logging.getLogger(__name__)
 STATION_JSON_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/station_scope.json')
 USER_SETTINGS_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/user_settings.json')
 STATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'state')
+NOW_PLAYING_PATH = os.path.join(STATE_DIR, 'now_playing.json')
 
 # --------------------------------------------------
 # ----------------- HANDY FUNCY --------------------
@@ -67,6 +84,9 @@ def save_user_settings(data):
 # --------------------------------------------------
 
 @app.route('/state/<filename>')
+#                                                           #
+#           endpoint to serve state files                   #
+#                                                           #
 def serve_state_file(filename):
     try:
         return send_from_directory(STATE_DIR, filename)
@@ -74,10 +94,11 @@ def serve_state_file(filename):
         return f"File '{filename}' not found in state directory.", 404
     
 
+
 @app.route('/radios/play/<int:radio_num>', methods=['GET'])
 def play_radio(radio_num):
 #                                                           #
-#   endpoint to play radio stream                           #
+#           endpoint to play radio stream                   #
 #                                                           #
     stations = load_json(STATION_JSON_PATH)
     
@@ -88,32 +109,93 @@ def play_radio(radio_num):
     stream_url = station['url']
     station_uuid = station['stationuuid']
 
-    try: 
-        with open(USER_SETTINGS_PATH, 'r', encoding='utf-8') as file:
-                user_settings = json.load(file)
-
-        # Get volume from user settings
-        volume = user_settings['User Settings'][0].get('volume', 25)
-        
-        user_settings['User Settings'][0]['last_station_uuid'] = station_uuid
-
-        with open(USER_SETTINGS_PATH, 'w', encoding='utf-8') as file:
-            json.dump(user_settings, file, indent=4)
-
-        logger.info(f"updated user's last listened station to {station_uuid}")
-    
-    except Exception as e:
-        logger.error(f"error while updating last_station: {e}")
-        volume = 25  # default volume if settings can't be read
-
     try:
-        # Play stream with volume from settings
-        audio_player.play_stream(stream_url, volume=volume)
-        logger.info(f'trying to play stream: {stream_url} with volume {volume}')
+        # update user's last listened station
+        user_settings = load_json(USER_SETTINGS_PATH)
+        user_settings['User Settings'][0]['last_station_uuid'] = station_uuid
+        save_user_settings(user_settings)
+        
+        # update now playing info
+        now_playing = load_json(NOW_PLAYING_PATH)
+        now_playing['current_station'].update({
+            'name': station['name'],
+            'stationuuid': station_uuid,
+            'url': stream_url,
+            'is_playing': True,
+            'volume': user_settings['User Settings'][0].get('volume', 25)
+        })
+        
+        # check for personal title in favorites
+        for fav in user_settings.get('Favourite Stations', []):
+            if fav['stationuuid'] == station_uuid:
+                now_playing['current_station']['personal_title'] = fav.get('personal_title')
+                break
+        
+        with open(NOW_PLAYING_PATH, 'w') as f:
+            json.dump(now_playing, f, indent=4)
+        
+        # start playback
+        audio_player.play_stream(stream_url)
         return '', 204
     except Exception as e:
+        logger.error(f"Error playing radio: {e}")
         return f"Error playing the radio stream: {e}", 500
 
+
+
+@app.route('/audio/pause', methods=['POST'])
+#                                                           #
+#           endpoint to pause radio stream                  #
+#                                                           #
+
+def pause_playback():
+    try:
+        # toggle pause/resume
+        if audio_player.pause_stream():
+            # update state
+            now_playing = load_json(NOW_PLAYING_PATH)
+            now_playing['current_station']['is_playing'] = not audio_player.is_paused
+            with open(NOW_PLAYING_PATH, 'w') as f:
+                json.dump(now_playing, f, indent=4)
+            return jsonify({"status": "success", "is_playing": not audio_player.is_paused})
+        else:
+            raise RuntimeError("failed to toggle pause state")
+    except Exception as e:
+        logger.error(f"failed to toggle pause: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route('/now_playing')
+#                                                           #
+#           endpoint to get now playing info                #
+#                                                           #
+
+def get_now_playing():
+    try:
+        now_playing = load_json(NOW_PLAYING_PATH)
+        return jsonify(now_playing)
+    except Exception as e:
+        logger.error(f"failed to get now playing info: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route('/state/now_playing.json', methods=['POST'])
+#                                                           #
+#           endpoint to update now playing info             #
+#                                                           #
+
+def update_now_playing():
+    try:
+        data = request.get_json()
+        with open(NOW_PLAYING_PATH, 'w') as f:
+            json.dump(data, f, indent=4)
+        return jsonify({"status": "success"}), 200
+    except Exception as e:
+        logger.debug(f"failed to update now playing: {e}")
+        return jsonify({"error": str(e)}), 500
+        
 
 @app.route('/add_favorite', methods=['POST'])
 # BUG: Uncaught SyntaxError: '' string literal contains an unescaped line break
@@ -158,7 +240,12 @@ def add_favorite():
     return jsonify({"message": "Station added to favorites"}), 201 # TODO: to display via frontend
 
 
+
 @app.route('/check_stations_status', methods=['POST'])
+#                                                           #
+#      endpoint to check if favorite stations are live      # 
+#                                                           #
+
 def check_stations_status():
     """check if favorite stations are live"""
     try:
@@ -328,6 +415,7 @@ def update_audio_settings():
         return jsonify({"status": "success"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
+
 
 
 if __name__ == "__main__":

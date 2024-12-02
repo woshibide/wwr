@@ -12,19 +12,47 @@
     <!-- used for page transitions -->
     <div class="page-overlay"></div>
 
+    <!-- now playing panel -->
+    <div class="now-playing-panel">
+        <button class="now-playing-toggle" id="now-playing-toggle">
+            <span class="now-playing-icon">🎵</span>
+        </button>
+        
+        <div class="now-playing-content">
+            <div class="station-info">
+                <div class="marquee-container">
+                    <div class="marquee-content" id="nowPlayingMarquee"></div>
+                </div>
+            </div>
+            
+            <div class="playback-controls">
+                <button class="control-btn pause-btn" id="pauseButton">
+                    <div class="pause-icon">
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                
+                <div class="volume-control">
+                    <input type="range" id="volumeSlider" min="0" max="100" value="25">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav>   
         {% block navigation %} 
         <div class="nav-container">
-            <button class="menu-toggle" id="menu-toggle">+</button>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">+</button>
             <nav class="nav-menu" id="nav-menu">
-              <a href="/">HOME</a>
-              <a href="/radios">RADIOS</a>
-              <a href="/settings">SETTINGS</a>
+                <a href="/" class="transition-fade">HOME</a>
+                <a href="/radios" class="transition-fade">RADIOS</a>
+                <a href="/settings" class="transition-fade">SETTINGS</a>
             </nav>
-          </div>
+        </div>
         {% endblock %}
     </nav>
-    <main>
+    <main class="transition-fade">
         {% block content %}
         {% endblock %}
     </main>

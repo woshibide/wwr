@@ -4,6 +4,11 @@
     padding: 0;
 }
 
+::-webkit-scrollbar {
+    display: none;
+}
+
+
 /* 
 -----------------------------
 -------- TRANSITION ---------
@@ -103,9 +108,13 @@ main {
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
+.menu-toggle:hover {
+    transform: scale(1.1);
+}
+
 .menu-toggle.active {
     transform-origin: center center;
-    transform: rotate(45deg);
+    transform: rotate(45deg) scale(1.1);
     transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -187,6 +196,188 @@ TODO: make it work for underline hovers
         transform: translateY(-100%);
     }
 }
+
+/* 
+------------------------------
+------   NOW PLAYING  --------
+------------------------------
+*/
+
+.now-playing-panel {
+    --panel-height: 20svh;
+    position: fixed;
+    top: calc(-1 * var(--panel-height)); /* start fully off-screen */
+    right: 2rem;
+    padding-left: 6rem;
+    width: 80svw;
+    height: var(--panel-height);
+    background: transparent;
+    transition: top 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 100;
+    font-size: 2rem;
+    z-index: 200000; /* just below nav menu z-index */
+}
+
+.now-playing-panel.active {
+    top: 4rem;
+}
+
+.now-playing-toggle {
+    position: fixed;
+    right: 2rem; 
+    top: 4rem; 
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 200000; /* just below nav menu z-index */
+    font-size: 3rem;
+}
+
+.now-playing-toggle:hover {
+    transform: scale(1.1);
+}
+
+.now-playing-content {
+    padding-right: 3rem;
+}
+
+.playback-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.control-btn:hover {
+    transform: scale(1.1);
+}
+
+/* pause button animation */
+.pause-icon {
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+}
+
+.pause-icon span {
+    width: 1rem;
+    height: 100%;
+    color: white;
+    background-color: black;
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.pause-icon.playing span:first-child {
+    transform: translateX(7px) rotate(-45deg);
+}
+
+.pause-icon.playing span:last-child {
+    transform: translateX(-7px) rotate(45deg);
+}
+
+.volume-control {
+    flex: 1;
+}
+
+.volume-control input[type="range"] {
+    margin: auto;
+    -webkit-appearance: none;
+    position: relative;
+    overflow: hidden;
+    height: 3rem; /* slightly smaller for better proportions */
+    width: 100%;
+    cursor: pointer;
+    border-radius: 0;
+    background: white;
+}
+
+.volume-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1rem;
+    height: 3rem;
+    background: black;
+    border: none;
+    border-radius: 0;
+    box-shadow: -20000px 0 0 20000px black;
+}
+
+.volume-control input[type="range"]::-moz-range-track {
+    height: 3rem;
+    background: #e1e1e1;
+    border: none;
+    border-radius: 0;
+}
+
+.volume-control input[type="range"]::-moz-range-thumb {
+    height: 3rem;
+    width: 2rem;
+    background: white;
+    border: none;
+    box-shadow: -20000px 0 0 20000px black;
+    border-radius: 0;
+}
+
+.volume-control input[type="range"]::-ms-fill-lower {
+    background: black;
+    border-radius: 0;
+}
+
+.volume-control input[type="range"]::-ms-thumb {
+    background: greenyellow;
+    border: none;
+    height: 40px;
+    width: 20px;
+    box-sizing: border-box;
+    border-radius: 0;
+}
+
+.volume-control input[type="range"]::-ms-track {
+    background: #e1e1e1;
+    color: transparent;
+    height: 5rem;
+    border: none;
+    border-radius: 0;
+}
+
+.volume-control input[type="range"]::-ms-tooltip {
+    display: none;
+    border-radius: 0;
+}
+
+/* station info with marquee */
+.station-info {
+    padding-bottom: 1rem;
+}
+
+.now-playing-panel .marquee-container {
+    opacity: 1;
+    color: black;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0.5rem 0;
+}
+
+.now-playing-panel .marquee-content {
+    opacity: 1;
+    color: black;
+}
+
 
 /* 
 -----------------------
