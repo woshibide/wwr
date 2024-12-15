@@ -1,10 +1,10 @@
 {
     "current_station": {
         "is_playing": true,
-        "name": "1000 HITS Classical",
-        "personal_title": "tutututututu tudutudu dududutu",
-        "stationuuid": "cf670706-e552-4ffd-b0fc-0a3b55315cf6",
-        "url": "https://ais-sa2.cdnstream1.com/2208_128.mp3",
-        "volume": 50
+        "name": "#1 Splash Love",
+        "personal_title": "\ud83d\udcaa",
+        "stationuuid": "2006f6cb-65c3-4e31-8626-22922f22b3d4",
+        "url": "https://ais-sa2.cdnstream1.com/2210_128.mp3",
+        "volume": 8
     }
 }
