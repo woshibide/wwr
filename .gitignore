@@ -1,5 +1,8 @@
 .DS_Store
 
+# large file
+web/flask/state/station_scope.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
