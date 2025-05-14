@@ -16,3 +16,28 @@ volume control updates so fast it deletes user's favorite stations settings, lol
 
 `wget-log` makes me paranoid, i have no clue how come that file appears 
 
+
+
+
+
+17 pin takes power 3.3 voltage (yellow wire)
+next are the next
+18 - 1 
+19 - 2
+20 - 3
+...
+27 - 10
+
+button
+pin 15-16
+we ask the opposite pin to where the voltage is going to get state change 
+both are io
+
+
+
+pin 1 - lamp
+
+
+
+
+

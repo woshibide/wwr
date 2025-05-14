@@ -1,10 +1,10 @@
 {
     "current_station": {
         "is_playing": true,
-        "name": " Radio Gameplay ",
-        "personal_title": "kind of trash but i like it",
-        "stationuuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
-        "url": "https://c22.radioboss.fm:8144/GamePlay",
-        "volume": 61
+        "name": "\u00c9xitos (Matamoros) - 91.3 FM - XHMLS-FM - Grupo Radio Avanzado - Matamoros, Tamaulipas",
+        "personal_title": "this is to keep me going",
+        "stationuuid": "ac15e119-b81d-4fb8-b706-73ffcf123db6",
+        "url": "https://ice8.securenetsystems.net/EXITO913",
+        "volume": 8
     }
 }

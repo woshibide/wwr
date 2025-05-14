@@ -1,8 +1,8 @@
 {
     "User Settings": [
         {
-            "last_station_uuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
-            "volume": 61
+            "last_station_uuid": "ac15e119-b81d-4fb8-b706-73ffcf123db6",
+            "volume": 8
         }
     ],
     "Favourite Stations": [
@@ -10,61 +10,55 @@
             "name": " Exclusively Whitney Houston ",
             "stationuuid": "ef2dac34-be6c-4f6f-9408-88947e0219cb",
             "personal_title": "<3 whitney",
-            "is_it_live": true
+            "is_it_live": false
         },
         {
             "name": " Radio Gameplay ",
             "stationuuid": "387753d6-20d0-4aaf-839c-2342b5ba9616",
             "personal_title": "kind of trash but i like it",
-            "is_it_live": true
+            "is_it_live": false
         },
         {
             "name": ". \u0645\u062e\u062a\u0635\u0631 \u0627\u0644\u0633\u064a\u0631\u0629",
             "stationuuid": "367578fd-4670-4956-8699-4d12c962b292",
             "personal_title": "total slay",
-            "is_it_live": true
+            "is_it_live": false
         },
         {
             "name": "1000 HITS Classical",
             "stationuuid": "cf670706-e552-4ffd-b0fc-0a3b55315cf6",
             "personal_title": "tutututututu tudutudu dududutu",
-            "is_it_live": true
+            "is_it_live": false
         },
         {
             "name": " Exclusively Madonna",
             "stationuuid": "319a9758-9b6b-4aa6-8415-432e43c46d1e",
-            "personal_title": "i kind of liked it",
-            "is_it_live": true
+            "personal_title": "yas",
+            "is_it_live": false
         },
         {
             "name": "__HAPPY HARDCORE__ by rautemusik (rm.fm)",
             "stationuuid": "b9fad3b3-f66e-4ede-84e5-0d4641aabb66",
-            "personal_title": "i kind of liked it",
-            "is_it_live": true
-        },
-        {
-            "name": "2AC\u6fb3\u6d32\u534e\u4eba\u7535\u53f0",
-            "stationuuid": "e31b6087-fd58-4757-aed3-41f8b47b9b5d",
-            "personal_title": "i kind of liked it",
-            "is_it_live": null
-        },
-        {
-            "name": " La SuperSonica",
-            "stationuuid": "6573a081-63e1-4951-987d-94607ffedad8",
-            "personal_title": "\ud83e\udd1f",
-            "is_it_live": true
+            "personal_title": "this is to keep me going",
+            "is_it_live": false
         },
         {
             "name": "(((EBM-Radio)))",
             "stationuuid": "eedf60d7-37ec-43be-83b4-60da70d0b22b",
             "personal_title": "\ud83d\udcaa",
-            "is_it_live": true
+            "is_it_live": false
         },
         {
             "name": ".\u0627\u0644\u0642\u0631\u0622\u0646",
             "stationuuid": "7d65c355-a932-4279-bfec-57d5eacecd3c",
             "personal_title": "\ud83e\udef0\ud83e\udd0c\ud83e\udd1f",
-            "is_it_live": true
+            "is_it_live": false
+        },
+        {
+            "name": "89.5 KNCJ \u2014 Nevada Classical & Jazz",
+            "stationuuid": "55583cf0-397a-4a29-b495-0964898a8ac5",
+            "personal_title": "\ud83d\udd7a\ud83e\udd4a\ud83e\udd4a",
+            "is_it_live": false
         }
     ]
 }

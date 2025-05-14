@@ -23,7 +23,7 @@ def save_stations_to_json(stations, filename='../state/station_scope.json'):
 
 def main():
     logger.info("Fetching radio stations...")
-    stations = fetch_stations(limit=1000)  
+    stations = fetch_stations(limit=50000)  
     if stations:
         save_stations_to_json(stations)
     else:

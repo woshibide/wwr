@@ -310,6 +310,25 @@ TODO: make it work for underline hovers
     transform: translateX(-7px) rotate(45deg);
 }
 
+.previous-btn, .next-btn {
+    background: none;
+    border: none;
+    color: black;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0.5em;
+    transition: transform 0.2s;
+}
+
+.previous-btn:hover, .next-btn:hover {
+    transform: scale(1.1);
+}
+
+.previous-icon, .next-icon {
+    display: inline-block;
+}
+
+
 .volume-control {
     flex: 1;
 }

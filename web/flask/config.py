@@ -2,8 +2,8 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-STATION_JSON_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/station_scope.json')
-USER_SETTINGS_PATH = os.path.expanduser('~/kabk/hacklab/dev/web/flask/state/user_settings.json')
+STATION_JSON_PATH = os.path.expanduser('~/kabk/radio/dev/web/flask/state/station_scope.json')
+USER_SETTINGS_PATH = os.path.expanduser('~/kabk/radio/dev/web/flask/state/user_settings.json')
 # STATION_JSON_PATH = os.path.expanduser('~/wwr/web/flask/state/station_scope.json')
 # USER_SETTINGS_PATH = os.path.expanduser('~/wwr/web/flask/state/user_settings.json')
 

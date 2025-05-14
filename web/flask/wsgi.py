@@ -90,7 +90,7 @@ def serve_state_file(filename):
 
 
 @app.route('/radios/play/<int:radio_num>', methods=['GET'])
-def play_radio(radio_num):
+def play_radio(radio_num): # maybe end point is not even needed, just trigger this..?
 #                                                           #
 #           endpoint to play radio stream                   #
 #                                                           #
@@ -157,27 +157,6 @@ def stop_playback():
         return jsonify({"error": str(e)}), 500
 
 
-
-# @app.route('/audio/pause', methods=['POST'])
-# #                                                           #
-# #           endpoint to pause radio stream                  #
-# #                                                           #
-
-# def pause_playback():
-#     try:
-#         # toggle pause/resume
-#         if audio_player.pause_stream():
-#             # update state
-#             now_playing = load_json(NOW_PLAYING_PATH)
-#             now_playing['current_station']['is_playing'] = not audio_player.is_paused
-#             with open(NOW_PLAYING_PATH, 'w') as f:
-#                 json.dump(now_playing, f, indent=4)
-#             return jsonify({"status": "success", "is_playing": not audio_player.is_paused})
-#         else:
-#             raise RuntimeError("failed to toggle pause state")
-#     except Exception as e:
-#         logger.error(f"failed to toggle pause: {e}")
-#         return jsonify({"error": str(e)}), 500
 
 
 
@@ -345,6 +324,69 @@ def radio_details(radio_num):
 
     return render_template('radio_details.html', radio_num=radio_num, station=station, clickcount=clickcount)
 
+
+# potentially not needed, maybe only in frontend
+@app.route('/radios/next', methods=['POST'])
+def next_radio():
+    # get current station info
+    now_playing = load_json(NOW_PLAYING_PATH)
+    stations = load_json(STATION_JSON_PATH)
+    
+    # find current station index
+    current_uuid = now_playing['current_station'].get('stationuuid')
+    current_index = 0
+    
+    for i, station in enumerate(stations):
+        if station['stationuuid'] == current_uuid:
+            current_index = i
+            break
+    
+    # calculate next station index (wrap around to beginning if at end)
+    next_index = (current_index + 1) % len(stations)
+    
+    while True:
+        try:
+            # use existing play_radio function to handle playback
+            return play_radio(next_index + 1)  # add 1 since play_radio uses 1-based indexing
+        except Exception as e:
+            logger.warning(f"skipping station {next_index + 1} due to error: {e}")
+            next_index = (next_index + 1) % len(stations)  # move to next station
+
+
+@app.route('/radios/previous', methods=['POST'])
+def previous_radio():
+    # get current station info
+    now_playing = load_json(NOW_PLAYING_PATH)
+    logger.debug(f"loaded now playing info: {now_playing}")
+    stations = load_json(STATION_JSON_PATH)
+    logger.debug(f"loaded stations info: {stations}")
+    
+    # find current station index
+    current_uuid = now_playing['current_station'].get('stationuuid')
+    logger.debug(f"current station uuid: {current_uuid}")
+    current_index = 0
+    
+    for i, station in enumerate(stations):
+        if station['stationuuid'] == current_uuid:
+            current_index = i
+            logger.debug(f"found current station index: {current_index}")
+            break
+    
+    # calculate previous station index (wrap around to end if at beginning)
+    prev_index = (current_index - 1) % len(stations)
+    
+    while True:
+        try:
+            # use existing play_radio function to handle playback
+            return play_radio(prev_index + 1)  # add 1 since play_radio uses 1-based indexing
+        except Exception as e:
+            error_message = str(e)
+            if "Unknown mpeg MIME type" in error_message:
+                logger.warning(f"skipping station {prev_index + 1} due to MIME type error")
+                prev_index = (prev_index - 1) % len(stations)  # move to previous station
+            else:
+                logger.error(f"error changing to previous station: {e}")
+                return jsonify({"error": str(e)}), 500
 
 @app.route('/settings', methods=['GET', 'POST'])
 def user_settings():

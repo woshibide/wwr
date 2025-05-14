@@ -180,4 +180,53 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('pageshow', () => {
         overlay.style.opacity = '0';
     });
+
+    // add these with your other event listeners
+    document.getElementById('previousButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/radios/previous', {
+                method: 'POST',
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to change station');
+            }
+            
+            // update now playing info after changing station
+            await updateNowPlaying();
+        } catch (error) {
+            console.error('Error changing to previous station:', error);
+        }
+    });
+
+    document.getElementById('nextButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch('/radios/next', {
+                method: 'POST',
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to change station');
+            }
+            
+            // update now playing info after changing station
+            await updateNowPlaying();
+        } catch (error) {
+            console.error('Error changing to next station:', error);
+        }
+    });
+
+    // helper function to update now playing display
+    async function updateNowPlaying() {
+        try {
+            const response = await fetch('/now_playing');
+            const data = await response.json();
+            
+            const marquee = document.getElementById('nowPlayingMarquee');
+            const stationName = data.current_station.personal_title || data.current_station.name;
+            marquee.textContent = stationName;
+        } catch (error) {
+            console.error('Error updating now playing info:', error);
+        }
+    }
 });
