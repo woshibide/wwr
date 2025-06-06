@@ -137,6 +137,28 @@ def play_radio(radio_num): # maybe end point is not even needed, just trigger th
         return f"Error playing the radio stream: {e}", 500
 
 
+@app.route('/radios/play/uuid/<string:station_uuid>', methods=['GET'])
+def play_radio_by_uuid(station_uuid):
+    """
+    endpoint to play a radio stream by its uuid
+    this is useful when we have the uuid but not the index
+    """
+    stations = load_json(STATION_JSON_PATH)
+    
+    # find the station with the matching uuid
+    station_index = -1
+    for i, station in enumerate(stations):
+        if station.get('stationuuid') == station_uuid:
+            station_index = i
+            break
+    
+    if station_index == -1:
+        logger.error(f"station with uuid {station_uuid} not found")
+        return f"radio station with uuid {station_uuid} not found :(", 404
+    
+    # use the existing play_radio function with the found index
+    return play_radio(station_index + 1)  # add 1 since play_radio uses 1-based indexing
+
 
 @app.route('/audio/stop', methods=['POST'])
 def stop_playback():
@@ -472,6 +494,108 @@ def update_audio_settings():
         return jsonify({"status": "success"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
+
+
+@app.route('/api/weather/local')
+def get_local_weather():
+    """
+    endpoint to get local weather data with enhanced location detection
+    caches weather data to reduce api calls
+    """
+    import requests
+    import time
+    
+    try:
+        # check if we have cached weather data (cache for 15 minutes)
+        cache_file = os.path.join(STATE_DIR, 'weather_cache.json')
+        cache_duration = 15 * 60  # 15 minutes in seconds
+        
+        if os.path.exists(cache_file):
+            try:
+                with open(cache_file, 'r') as f:
+                    cached_data = json.load(f)
+                
+                # check if cache is still valid
+                if time.time() - cached_data.get('timestamp', 0) < cache_duration:
+                    logger.debug("returning cached weather data")
+                    return jsonify(cached_data['data'])
+            except Exception as cache_error:
+                logger.warning(f"failed to read weather cache: {cache_error}")
+        
+        # try to get location first using ipapi
+        location_data = None
+        try:
+            location_response = requests.get('https://ipapi.co/json/', timeout=5)
+            if location_response.status_code == 200:
+                location_data = location_response.json()
+        except Exception as location_error:
+            logger.warning(f"failed to get location data: {location_error}")
+        
+        # determine location and weather query
+        if location_data and location_data.get('city'):
+            location = f"{location_data.get('city', 'unknown city')}, {location_data.get('country_name', 'unknown country')}"
+            weather_query = location_data['city']
+        else:
+            # fallback to den haag
+            location = "den haag, netherlands"
+            weather_query = "den haag"
+        
+        # fetch weather data from wttr.in
+        weather_response = requests.get(
+            f'https://wttr.in/{weather_query}?format=j1',
+            timeout=10
+        )
+        
+        if weather_response.status_code != 200:
+            raise Exception(f"weather api returned status {weather_response.status_code}")
+        
+        weather_data = weather_response.json()
+        
+        if not weather_data.get('current_condition') or not weather_data['current_condition']:
+            raise Exception("invalid weather data structure")
+        
+        current_condition = weather_data['current_condition'][0]
+        
+        # prepare response data
+        response_data = {
+            'temperature': current_condition.get('temp_C'),
+            'feels_like': current_condition.get('FeelsLikeC'),
+            'humidity': current_condition.get('humidity'),
+            'condition': current_condition.get('weatherDesc', [{}])[0].get('value', 'unknown'),
+            'weather_code': current_condition.get('weatherCode'),
+            'location': location.lower(),
+            'timestamp': int(time.time())
+        }
+        
+        # cache the response
+        try:
+            cache_data = {
+                'data': response_data,
+                'timestamp': time.time()
+            }
+            with open(cache_file, 'w') as f:
+                json.dump(cache_data, f, indent=4)
+        except Exception as cache_error:
+            logger.warning(f"failed to cache weather data: {cache_error}")
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        logger.error(f"error fetching weather data: {e}")
+        
+        # return fallback data
+        fallback_data = {
+            'temperature': '--',
+            'feels_like': '--',
+            'humidity': '--',
+            'condition': 'data unavailable',
+            'weather_code': '113',  # default to sunny
+            'location': 'den haag, netherlands',
+            'timestamp': int(time.time()),
+            'error': str(e)
+        }
+        
+        return jsonify(fallback_data), 500
 
 
 

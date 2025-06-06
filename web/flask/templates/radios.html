@@ -4,7 +4,7 @@
 <h1 style="margin: 40svh 0 40svh 2rem; width:20ch;">there is now {{ stations_working }}<br>stations playing<br>all sorts of stuff</h1>
 <div class="radio-list-wrapper">
     <ul>
-        <div class="radios-list">
+        <div class="radios-list" id="radiosList">
             {% for station in stations %}
             <li>
                 <button type="button" id="radio-play-text"
@@ -18,6 +18,22 @@
             </li>
             {% endfor %}
         </div>
+        <!-- loading indicator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <p>loading more stations...</p>
+        </div>
+        <!-- end of list indicator -->
+        <div id="endOfList" class="end-of-list" style="display: none;">
+            <p>all {{ total_stations }} stations loaded!</p>
+        </div>
     </ul>
 </div>
+
+<script>
+window.radioConfig = {
+    currentIndex: {{ initial_batch_size }},
+    totalStations: {{ total_stations }},
+    batchSize: 25
+};
+</script>
 {% endblock %}

@@ -1,10 +1,10 @@
 {
     "current_station": {
         "is_playing": true,
-        "name": "\u00c9xitos (Matamoros) - 91.3 FM - XHMLS-FM - Grupo Radio Avanzado - Matamoros, Tamaulipas",
-        "personal_title": "this is to keep me going",
-        "stationuuid": "ac15e119-b81d-4fb8-b706-73ffcf123db6",
-        "url": "https://ice8.securenetsystems.net/EXITO913",
-        "volume": 8
+        "name": "Subtle Radio",
+        "personal_title": "uk vibes",
+        "stationuuid": "1dbdc89f-f0d1-4bf7-8922-266edeb912dd",
+        "url": "https://subtle.out.airtime.pro/subtle_a",
+        "volume": 66
     }
 }

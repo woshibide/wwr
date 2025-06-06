@@ -1,4 +1,73 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // dark mode functionality based on time
+    function checkTimeAndSetTheme() {
+        const now = new Date();
+        const hour = now.getHours();
+        
+        // dark mode between 6 PM (18:00) and 6 AM (06:00)
+        const isDarkTime = hour >= 18 || hour < 6;
+        
+        // check if user has manually overridden the theme
+        const manualTheme = localStorage.getItem('manualTheme');
+        
+        if (manualTheme) {
+            // user has manually set theme, use that
+            if (manualTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        } else {
+            // use automatic time-based theme
+            if (isDarkTime) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+    }
+    
+    // manual theme toggle functionality
+    const themeToggle = document.getElementById('dark-mode-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const manualTheme = localStorage.getItem('manualTheme');
+            
+            if (currentTheme === 'dark') {
+                // switch to light mode
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('manualTheme', 'light');
+            } else {
+                // switch to dark mode
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('manualTheme', 'dark');
+            }
+        });
+    }
+    
+    // reset to automatic theme after 1 hour of manual override
+    const manualThemeTime = localStorage.getItem('manualThemeTime');
+    if (manualThemeTime) {
+        const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
+        if (Date.now() - parseInt(manualThemeTime) > oneHour) {
+            localStorage.removeItem('manualTheme');
+            localStorage.removeItem('manualThemeTime');
+        }
+    }
+    
+    // store time when manual theme is set
+    const manualTheme = localStorage.getItem('manualTheme');
+    if (manualTheme && !manualThemeTime) {
+        localStorage.setItem('manualThemeTime', Date.now().toString());
+    }
+    
+    // set initial theme
+    checkTimeAndSetTheme();
+    
+    // check every minute for time changes
+    setInterval(checkTimeAndSetTheme, 60000);
+
     // menu toggle
     const menuToggle = document.getElementById('menu-toggle');
     const navMenu = document.getElementById('nav-menu');
@@ -228,5 +297,85 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error updating now playing info:', error);
         }
+    }
+    
+    // infinite scroll functionality for radios page
+    if (window.location.pathname === '/radios' && window.radioConfig) {
+        const radiosList = document.getElementById('radiosList');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const endOfList = document.getElementById('endOfList');
+        
+        let currentIndex = window.radioConfig.currentIndex;
+        const totalStations = window.radioConfig.totalStations;
+        const batchSize = window.radioConfig.batchSize;
+        let isLoading = false;
+        
+        // function to load more stations
+        async function loadMoreStations() {
+            if (isLoading || currentIndex >= totalStations) return;
+            
+            isLoading = true;
+            loadingIndicator.style.display = 'block';
+            
+            try {
+                const response = await fetch('/radios/batch/' + currentIndex + '/' + batchSize);
+                const data = await response.json();
+                
+                if (data.stations && data.stations.length > 0) {
+                    // add new stations to the list
+                    data.stations.forEach(station => {
+                        const li = document.createElement('li');
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.id = 'radio-play-text';
+                        button.textContent = station.name;
+                        button.onclick = function() {
+                            window.location.href = '/radios/play/' + station.radio_num;
+                        };
+                        
+                        const link = document.createElement('a');
+                        link.href = '/radios/' + station.radio_num;
+                        link.className = 'radio-details-link';
+                        link.textContent = '?';
+                        
+                        li.appendChild(button);
+                        li.appendChild(link);
+                        radiosList.appendChild(li);
+                    });
+                    
+                    currentIndex += data.stations.length;
+                    
+                    // check if we've loaded all stations
+                    if (!data.has_more || currentIndex >= totalStations) {
+                        endOfList.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('error loading more stations:', error);
+            } finally {
+                isLoading = false;
+                loadingIndicator.style.display = 'none';
+            }
+        }
+        
+        // infinite scroll detection
+        function handleScroll() {
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const documentHeight = document.documentElement.offsetHeight;
+            
+            // load more when user is near bottom (within 200px)
+            if (scrollPosition >= documentHeight - 200) {
+                loadMoreStations();
+            }
+        }
+        
+        // throttle scroll events
+        let scrollTimeout;
+        window.addEventListener('scroll', function() {
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            scrollTimeout = setTimeout(handleScroll, 100);
+        });
     }
 });

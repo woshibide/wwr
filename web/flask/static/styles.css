@@ -1,11 +1,288 @@
+/* html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}button,[type="button"],[type="reset"],[type="submit"]{-webkit-appearance:button}button::-moz-focus-inner,[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="submit"]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type="button"]:-moz-focusring,[type="reset"]:-moz-focusring,[type="submit"]:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type="checkbox"],[type="radio"]{box-sizing:border-box;padding:0}[type="number"]::-webkit-inner-spin-button,[type="number"]::-webkit-outer-spin-button{height:auto}[type="search"]{-webkit-appearance:textfield;outline-offset:-2px}[type="search"]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none} */
+
 * {
     box-sizing: border-box;
-    margin: 0;
     padding: 0;
+    margin: 0;
+    vertical-align: baseline !important;
 }
 
 ::-webkit-scrollbar {
     display: none;
+}
+
+/* 
+-----------------------------
+-------- DARK MODE ----------
+-----------------------------
+*/
+
+:root {
+    /* light mode colors */
+    --bg-color: white;
+    --text-color: black;
+    --border-color: black;
+    --hover-bg: black;
+    --hover-text: white;
+    --panel-bg: white;
+    --slider-bg: #e1e1e1;
+    --slider-thumb: white;
+    --slider-fill: black;
+    --overlay-bg: white;
+    --footer-bg: black;
+    --footer-text: white;
+    --button-bg: transparent;
+    --input-bg: transparent;
+    --marquee-bg: transparent;
+}
+
+[data-theme="dark"] {
+    /* dark mode colors */
+    --bg-color: #000;
+    --text-color: #404040;
+    --border-color: #1a1a1a;
+    --hover-bg: #e0e0e0;
+    --hover-text: #1a1a1a;
+    --panel-bg: #000;
+    --slider-bg: #404040;
+    --slider-thumb: #1a1a1a;
+    --slider-fill: #e0e0e0;
+    --overlay-bg: #1a1a1a;
+    --footer-bg: #e0e0e0;
+    --footer-text: #1a1a1a;
+    --button-bg: transparent;
+    --input-bg: transparent;
+    --marquee-bg: transparent;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 
+-----------------------------
+-------- DASHBOARD ----------
+-----------------------------
+*/
+
+.dashboard-container {
+    z-index: 15000;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    position: relative;
+}
+
+/* responsive layout for smaller screens */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    
+    .dashboard-panel {
+        min-height: 33vh;
+    }
+    
+    .favorites-panel {
+        order: -1; /* move favorites to the top on mobile */
+    }
+}
+
+.dashboard-panel {
+    padding: 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+    /* border: 0.5rem solid var(--border-color); */
+    text-align: left;
+    vertical-align: baseline;
+    margin-block: 1rem;
+    background-color: var(--panel-bg);
+}
+.dashboard-panel:first-child{
+    margin-left: 0.5rem;
+}
+
+/* local info panel - separate border as usual */
+.local-info-panel {
+    flex: 1;
+    background-color: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* shared border styling for radio and favorites panels */
+.radio-info-panel {
+    flex: 1.5;
+    background-color: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 0.3rem solid var(--border-color);
+    border-right: none;
+    margin-left: 0.5rem;
+    margin-right: 0;
+    margin-block: 1rem;
+    padding: 1rem;
+}
+
+.cute-image {
+    max-width: 100%; 
+    max-height: 400px;
+    overflow: hidden;
+    display: flex;
+    text-align: left;
+    /* align-items: center;
+    justify-content: center; */
+    flex-direction: column;
+}
+.cute-image p{
+    margin-bottom: 0.2rem;
+}
+
+.cute-image img {
+    max-width: 100%; 
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.station-details {
+    display: flex;
+    font-size: 2rem;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.station-name {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    line-height: 0.9;
+    text-transform: lowercase;
+    font-weight: 800;
+    text-align: left;
+}
+
+.station-metadata {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin: 0;
+    margin-bottom: 3rem;
+    text-transform: lowercase;
+    text-align: left;
+}
+
+.local-weather, .local-time {
+    text-align: left;
+    width: 100%;
+    text-transform: lowercase;
+    font-size: 1rem;
+}
+
+
+/* favorites panel (right) - shared border with radio panel */
+.favorites-panel {
+    flex: 1.5;
+    background-color: var(--panel-bg);
+    overflow-y: auto;
+    border: 0.3rem solid var(--border-color);
+    border-left: none;
+    margin-right: 0.5rem;
+    margin-block: 1rem;
+    padding: 1rem;
+}
+
+.favorites-panel h2 {
+    text-transform: lowercase;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: left;
+}
+
+.favorites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.favorite-station {
+    padding: 1.5rem;
+    background-color: var(--panel-bg);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    border: 0.15rem solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.favorite-station:hover {
+    background-color: var(--hover-bg);
+    color: var(--hover-text);
+}
+
+.favorite-station.active {
+    background-color: var(--hover-bg);
+    color: var(--hover-text);
+}
+
+.favorite-station-info {
+    flex: 1;
+    text-align: left;
+}
+
+.favorite-title {
+    font-size: 1rem;
+    color: inherit;
+    text-transform: lowercase;
+}
+
+.favorite-name {
+    margin-bottom: 0.5rem;
+    color: inherit;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-transform: lowercase;
+}
+
+.dashboard-station-live-indicator {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 0.3rem solid var(--border-color);
+    margin-left: 1rem;
+}
+
+.favorite-station:hover .dashboard-station-live-indicator {
+    border-color: var(--hover-text);
+}
+
+.favorite-station.active .dashboard-station-live-indicator {
+    border-color: var(--hover-text);
+}
+
+.dashboard-station-live-indicator.live {
+    background-color: var(--border-color);
+    animation: blink 1s infinite;
+}
+
+.favorite-station:hover .dashboard-station-live-indicator.live {
+    background-color: var(--hover-text);
+}
+
+.favorite-station.active .dashboard-station-live-indicator.live {
+    background-color: var(--hover-text);
 }
 
 
@@ -56,7 +333,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: white;
+    background-color: var(--overlay-bg);
     z-index: 1000;
     pointer-events: none;
     opacity: 0;
@@ -92,12 +369,12 @@ main {
 .nav-container {
     position: fixed;
     text-align: right;
-    z-index: 9999;
+    z-index: 5000;
 }
 
 .menu-toggle {
     position: relative;
-    z-index: 10000;
+    z-index: 5100;
     font-size: 5rem;
     font-weight: bold;
     padding: 1rem;
@@ -105,6 +382,7 @@ main {
     background: none;
     cursor: pointer;
     transform-origin: center center;
+    color: var(--text-color);
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -126,18 +404,18 @@ main {
     height: 100vh;
     display: none;
     flex-direction: column;
-    background-color: white;
-    color: black;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     padding: 4rem;
     padding-top: 45svh;
-    z-index: 9999;
+    z-index: 5000;
     overflow: hidden;
 }
 
 
 .nav-menu a {
     font-size: 5rem;
-    color: black;
+    color: var(--text-color);
     text-decoration: none;
     margin: 1rem;
     transition: color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -212,11 +490,11 @@ TODO: make it work for underline hovers
     padding: 2rem;
     width: 80svw;
     height: var(--panel-height);
-    background: transparent;
+    background-color: var(--panel-bg);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: top 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
     z-index: 100;
     font-size: 2rem;
-    z-index: 200000; /* just below nav menu z-index */
 }
 
 .now-playing-panel.active {
@@ -241,7 +519,7 @@ TODO: make it work for underline hovers
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    z-index: 200000; /* just below nav menu z-index */
+    z-index: 20000; /* above dashboard but accessible */
     font-size: 3rem;
 }
 
@@ -292,13 +570,14 @@ TODO: make it work for underline hovers
     position: relative;
     display: flex;
     justify-content: space-between;
+    background-color: var(--text-color);
 }
 
 .pause-icon span {
     width: 1rem;
     height: 100%;
-    color: white;
-    background-color: black;
+    color: var(--hover-text);
+    background-color: var(--text-color);
     transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -313,7 +592,7 @@ TODO: make it work for underline hovers
 .previous-btn, .next-btn {
     background: none;
     border: none;
-    color: black;
+    color: var(--text-color);
     font-size: 1.2em;
     cursor: pointer;
     padding: 0.5em;
@@ -336,48 +615,57 @@ TODO: make it work for underline hovers
 .volume-control input[type="range"] {
     margin: auto;
     -webkit-appearance: none;
+    appearance: none;
     position: relative;
     overflow: hidden;
-    height: 3rem; /* slightly smaller for better proportions */
+    height: 5rem;
     width: 100%;
     cursor: pointer;
     border-radius: 0;
-    background: white;
+    flex-grow: 1;
+    border: none;
+}
+
+.volume-control input[type="range"]::-webkit-slider-runnable-track {
+    background: var(--slider-bg);
+    border: none;
 }
 
 .volume-control input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 1rem;
-    height: 3rem;
-    background: black;
+    appearance: none;
+    width: 2rem;
+    height: 5rem;
+    background: var(--slider-thumb);
     border: none;
     border-radius: 0;
-    box-shadow: -20000px 0 0 20000px black;
+    box-shadow: -20000px 0 0 20000px var(--slider-fill);
 }
 
 .volume-control input[type="range"]::-moz-range-track {
-    height: 3rem;
-    background: #e1e1e1;
+    height: 5rem;
+    background: var(--slider-bg);
     border: none;
     border-radius: 0;
 }
 
 .volume-control input[type="range"]::-moz-range-thumb {
-    height: 3rem;
+    height: 5rem;
+    background: var(--slider-thumb);
     width: 2rem;
-    background: white;
     border: none;
-    box-shadow: -20000px 0 0 20000px black;
-    border-radius: 0;
+    border-radius: 0 !important;
+    box-shadow: -20000px 0 0 20000px var(--slider-fill);
+    box-sizing: border-box;
 }
 
 .volume-control input[type="range"]::-ms-fill-lower {
-    background: black;
+    background: var(--slider-fill);
     border-radius: 0;
 }
 
 .volume-control input[type="range"]::-ms-thumb {
-    background: greenyellow;
+    background: var(--slider-thumb);
     border: none;
     height: 40px;
     width: 20px;
@@ -386,7 +674,7 @@ TODO: make it work for underline hovers
 }
 
 .volume-control input[type="range"]::-ms-track {
-    background: #e1e1e1;
+    background: var(--slider-bg);
     color: transparent;
     height: 5rem;
     border: none;
@@ -405,7 +693,7 @@ TODO: make it work for underline hovers
 
 .now-playing-panel .marquee-container {
     opacity: 1;
-    color: black;
+    color: var(--text-color);
     overflow: hidden;
     white-space: nowrap;
     padding: 0.5rem 0;
@@ -413,7 +701,7 @@ TODO: make it work for underline hovers
 
 .now-playing-panel .marquee-content {
     opacity: 1;
-    color: black;
+    color: var(--text-color);
 }
 
 
@@ -427,8 +715,8 @@ footer {
     padding: 3rem;
     display: flex;
     height: 100vh;
-    background-color: black;
-    color: white;
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
 }
 
 .footer-container {
@@ -445,7 +733,11 @@ footer {
 -----------------------
 */
 
-
+.hello {
+    font-size: 5rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
 
 .circle-container {
     position: absolute;
@@ -498,7 +790,7 @@ svg {
 #radio-play-text, #add-radio-to-fav {
     background: none;
     border: none;
-    color: black;
+    color: var(--text-color);
     cursor: pointer;
     font-size: inherit;
     font-weight: inherit;
@@ -517,7 +809,7 @@ svg {
 .radio-details-link {
     font-size: inherit;
     text-decoration: none;
-    color: black;
+    color: var(--text-color);
 }
 
 
@@ -553,7 +845,7 @@ ul .radios-list li {
 
 .radio-dtl-wrapper p a {
     text-decoration: underline 0.5rem;
-    color: black;
+    color: var(--text-color);
 }
 
 .radio-dtl-wrapper #radio-play-text, .radio-dtl-wrapper #add-radio-to-fav {
@@ -586,7 +878,7 @@ ul .radios-list li {
     margin-bottom: 1rem;
 }
 
-#volume-display, #bass-display, #tremble-display{
+#volume-display{
     visibility: hidden;
     display: none;
 }
@@ -605,7 +897,7 @@ ul .radios-list li {
 }
 
 .slider-control input[type="range"]::-webkit-slider-runnable-track {
-    background: #e1e1e1;
+    background: var(--slider-bg);
     border: none;
 }
 
@@ -613,29 +905,29 @@ ul .radios-list li {
     -webkit-appearance: none;
     width: 2rem;
     height: 5rem;
-    background: white;
+    background: var(--slider-thumb);
     border: none;
-    box-shadow: -20000px 0 0 20000px black;
+    box-shadow: -20000px 0 0 20000px var(--slider-fill);
 }
 
 .slider-control input[type="range"]::-moz-range-track {
     height: 5rem;
-    background: #e1e1e1;;
+    background: var(--slider-bg);
     border: none;
 }
 
 .slider-control input[type="range"]::-moz-range-thumb {
     height: 5rem;
-    background: white;
+    background: var(--slider-thumb);
     width: 2rem;
     border: none;
     border-radius: 0 !important;
-    box-shadow: -20000px 0 0 20000px black;
+    box-shadow: -20000px 0 0 20000px var(--slider-fill);
     box-sizing: border-box;
 }
 
 .slider-control input[type="range"]::-ms-fill-lower { 
-    background: black;
+    background: var(--slider-fill);
 }
 
 .slider-control input[type="range"]::-ms-thumb { 
@@ -647,7 +939,7 @@ ul .radios-list li {
 }
 
 .slider-control input[type="range"]::-ms-track { 
-    background: #e1e1e1;
+    background: var(--slider-bg);
     color: transparent;
     height: 5rem;
     border: none;
@@ -674,7 +966,7 @@ ul .radios-list li {
     justify-content: center;
     position: sticky;
     top: 0;
-    background-color: white; 
+    background-color: var(--bg-color); 
     z-index: 10;
     height: 5rem;
     margin-block: 1rem;
@@ -685,8 +977,8 @@ ul .radios-list li {
 }
 
 .save-btn:hover {
-    background-color: black;
-    color: white;
+    background-color: var(--hover-bg);
+    color: var(--hover-text);
 }
 
 .save-btn {
@@ -696,9 +988,9 @@ ul .radios-list li {
     font-family: inherit;
     font-weight: inherit;
     padding: 0.5rem 1rem;
-    background-color: white;
-    color: black;
-    border: 0.5rem solid black;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 0.3rem solid var(--border-color);
     cursor: pointer;
     transition: background-color 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
@@ -713,11 +1005,11 @@ ul .radios-list li {
     margin-block: 0.5rem;
     display: flex;
     align-items: center;
-    background-color: #fff;
+    background-color: var(--panel-bg);
 }
 
 .favorite-stations li:hover {
-    border-bottom: 0.5rem solid black;
+    border-bottom: 0.5rem solid var(--border-color);
     margin-bottom: -0.5rem;
 }
 
@@ -727,7 +1019,7 @@ ul .radios-list li {
     height: 1rem;
     border-radius: 50%;
     margin-left: 1rem;
-    border: 0.2rem solid black;
+    border: 0.2rem solid var(--border-color);
 }
 
 .favorite-stations li .marquee-container, 
@@ -765,7 +1057,7 @@ input[type="text"] {
 
 input[type="text"]:focus,
 input[type="text"]:active {
-    outline: 0.5rem solid black; 
+    outline: 0.5rem solid var(--border-color); 
 }
 
 
@@ -776,11 +1068,11 @@ input[type="text"]:active {
     height: 1rem;
     border-radius: 50%;
     margin-right: 1rem;
-    border: 0.2rem solid black;
+    border: 0.2rem solid var(--border-color);
 }
 
 .station-live-indicator.live {
-    background-color: black;
+    background-color: var(--border-color);
     animation: blink 1s infinite;
 }
 
@@ -805,4 +1097,68 @@ input[type="text"]:active {
 .staged-for-deletion {
     transition: opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     opacity: 0.2;
+}
+
+/* loading animation */
+.loading-station {
+    display: inline-flex;
+    align-items: center;
+}
+
+.loading-dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    animation: loading-bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loading-bounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+    } 
+    40% { 
+        transform: scale(1.0);
+    }
+}
+
+/* loading indicators for dashboard */
+.loading-favorites {
+    text-align: left;
+    padding: 1.5rem;
+}
+
+.status-check-indicator {
+    font-family: inherit;
+    text-transform: lowercase;
+    border: 0.2rem solid var(--border-color) !important;
+    color: var(--text-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+
+/* responsive adjustments for neo-brutalist style */
+@media (max-width: 768px) {
+    .dashboard-panel {
+        transform: none !important;
+        margin: 0.5rem;
+        padding: 2rem;
+    }
+    
+    .station-name {
+        font-size: 3rem;
+    }
+    
+    .station-metadata {
+        font-size: 1.5rem;
+    }
 }

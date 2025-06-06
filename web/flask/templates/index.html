@@ -3,167 +3,68 @@
 {% block title %}HOME{% endblock %}
 
 {% block content %}
+<div class="hello">
+    <h1>greetings to you, radio lover</h1>
+</div>
 
+<div class="dashboard-container">
+    <!-- Left Panel - Local Information -->
+    <div class="dashboard-panel local-info-panel">
+        <div class="local-weather">
+            <p id="localWeatherTitle">checking local weather...</p>
+            <div id="localWeather" class="weather-display">
+            </div>
+        </div>
+        <div class="local-time">
+            <p>it is now
+            <span id="localTime" class="time-display">--:--</span><br> 
+            today is
+            <span id="localDate" class="date-display">--</span>
+            </p>
+        </div>
+        <div class="cute-image">
+            <p>here is a cute photo of a dog from internet</p>
+            <img id="dogImage" alt="cute dog of the day">
+        </div>
+    </div>
+    
+    <!-- Center Panel - Radio Information -->
+    <div class="dashboard-panel radio-info-panel">
+        <div class="station-details">
+            <div>
+                <h1 class="station-name">
+                    <a href="#" id="stationDetailsLink" style="text-decoration: none; color: inherit;">
+                        <span id="stationMetadata">Loading...</span>
+                    </a>
+                </h1>
+                <p class="station-metadata" id="stationName">Tuning in...</p>
+            </div>
+            <!-- Station Details -->
+            <div class="station-info-text">
+                <p>
+                    this station is broadcasting from 
+                    <span id="stationLocation">somewhere</span>
+                    where it's currently 
+                    <span id="stationTime">--:--</span>
+                    and the weather feels like 
+                    <span id="stationWeatherText">--°c</span>.
+                    people have been tuning in throughout the day.
+                </p>
+            </div>
+        </div>
+    </div>
 
-<script>
-    // Sample JSON Input
-    const circleData = {
-        "A055": {
-            "radioName": "Classic Hits",
-            "radioLocation": "New York City",
-            "weather": "Sunny 25°C",
-            "radioFrequency": "101.2 FM",
-            "rotationSpeed": 30, // in seconds
-            "fontSize": 36
-        },
-        "A059": {
-            "radioName": "Rock Station",
-            "radioLocation": "Los Angeles",
-            "weather": "Cloudy 20°C",
-            "radioFrequency": "99.5 FM",
-            "rotationSpeed": 35,
-            "fontSize": 44
-        },
-        "A072": {
-            "radioName": "Jazz FM",
-            "radioLocation": "Chicago",
-            "weather": "Rainy 18°C",
-            "radioFrequency": "88.7 FM",
-            "rotationSpeed": 40,
-            "fontSize": 52
-        },
-        "A193": {
-            "radioName": "Pop Beats",
-            "radioLocation": "Miami",
-            "weather": "Sunny 28°C",
-            "radioFrequency": "102.3 FM",
-            "rotationSpeed": 50,
-            "fontSize": 64
-        },
-        "A222": {
-            "radioName": "Hip Hop Hub",
-            "radioLocation": "Atlanta",
-            "weather": "Hot 32°C",
-            "radioFrequency": "107.9 FM",
-            "rotationSpeed": 60,
-            "fontSize": 88
-        }
-    };
+    <!-- Right Panel - Favorite Stations -->
+    <div class="dashboard-panel favorites-panel">
+        <h2>favorite stations</h2>
+        <div class="favorites-list" id="favoritesList">
+            <!-- Favorites will be loaded dynamically -->
+            <div class="loading-favorites" style="text-transform: lowercase; font-size: 1.5rem; color: black;">loading your favorites...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    // Base parameters
-    const baseDiameter = 600;
-    const diameterIncrement = 160;
-
-    /**
-     * Initializes the circular text display based on JSON data.
-     * @param {Object} data - The JSON data containing circle information.
-     */
-    function initializeCircularText(data) {
-        const keys = Object.keys(data);
-        keys.forEach((key, index) => {
-            const circleInfo = data[key];
-            createCircle(circleInfo, index, keys.length);
-        });
-    }
-
-    /**
-     * Creates a single rotating circle with text based on the provided data.
-     * @param {Object} data - The data for the circle.
-     * @param {number} index - The current index in recursion.
-     * @param {number} totalCircles - The total number of circles to create.
-     */
-    function createCircle(data, index, totalCircles) {
-        const diameter = baseDiameter + diameterIncrement * index;
-        const radius = diameter / 2;
-        const fontSize = data.fontSize || 16;
-        const rotationDuration = data.rotationSpeed || (30 + index * 10);
-        let opacity = 1.0 - (index * 0.1);
-        if (opacity < 0.1) opacity = 0.1;
-
-        const text = generateText(data);
-
-        // Create a container for the circle
-        const circleContainer = document.createElement('div');
-        circleContainer.classList.add('circle-container');
-        circleContainer.style.zIndex = totalCircles - index;
-        const mainContainer = document.querySelector('main');
-        mainContainer.appendChild(circleContainer);
-
-        // Create a rotating wrapper
-        const rotatingCircle = document.createElement('div');
-        rotatingCircle.classList.add('rotating-circle');
-        rotatingCircle.style.animationDuration = `${rotationDuration}s`;
-        rotatingCircle.style.animationName = 'rotation';
-        rotatingCircle.style.animationTimingFunction = 'linear';
-        rotatingCircle.style.animationIterationCount = 'infinite';
-        circleContainer.appendChild(rotatingCircle);
-
-        // Create the SVG element
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-        svg.setAttribute('width', diameter);
-        svg.setAttribute('height', diameter);
-        rotatingCircle.appendChild(svg);
-
-        // Create the circle path
-        const path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
-        const pathID = 'circlePath' + index;
-
-        const pathDefinition = `
-            M ${radius}, ${0}
-            A ${radius},${radius} 0 1,1 ${radius},${diameter}
-            A ${radius},${radius} 0 1,1 ${radius},${0}
-        `;
-        path.setAttribute('id', pathID);
-        path.setAttribute('d', pathDefinition);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', 'none');
-        svg.appendChild(path);
-
-        // Create the text element
-        const textElement = document.createElementNS("http://www.w3.org/2000/svg", 'text');
-        textElement.setAttribute('font-size', `${fontSize}px`);
-        textElement.setAttribute('fill', `rgba(0, 0, 0, ${opacity})`);
-        textElement.setAttribute('letter-spacing', '0');
-
-        // Create the textPath element
-        const textPath = document.createElementNS("http://www.w3.org/2000/svg", 'textPath');
-        textPath.setAttribute('href', '#' + pathID);
-        textPath.setAttribute('startOffset', '50%');
-        textPath.setAttribute('text-anchor', 'middle');
-        textPath.textContent = text;
-
-        textElement.appendChild(textPath);
-        svg.appendChild(textElement);
-
-        // Apply outline (dashed circle)
-        const outlineCircle = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-        outlineCircle.setAttribute('cx', radius);
-        outlineCircle.setAttribute('cy', radius);
-        outlineCircle.setAttribute('r', radius - 5);
-        outlineCircle.setAttribute('fill', 'none');
-        outlineCircle.setAttribute('stroke', `rgba(0, 0, 0, ${opacity})`);
-        outlineCircle.setAttribute('stroke-width', '1');
-        outlineCircle.setAttribute('stroke-dasharray', '5,25');
-        svg.insertBefore(outlineCircle, textElement);
-    }
-
-    /**
-     * Generates a concatenated text string from the data object.
-     * @param {Object} data - The data object containing information to display.
-     * @returns {string} - The generated text string.
-     */
-    function generateText(data) {
-        let text = '';
-        if (data.weather) text += `Weather: ${data.weather} `;
-        if (data.radioFrequency) text += `Frequency: ${data.radioFrequency} `;
-        if (data.radioName) text += `Name: ${data.radioName} `;
-        if (data.radioLocation) text += `Location: ${data.radioLocation} `;
-        return text.trim();
-    }
-
-    // Initialize the circular text display with JSON data
-    initializeCircularText(circleData);
-
-</script>
-
+{% block footer %}
+<!-- No footer on dashboard -->
 {% endblock %}
